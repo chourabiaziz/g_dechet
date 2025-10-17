@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BoucleEconomieCirculaire{% endblock %}
+
+{% block body %}
+    <h1>BoucleEconomieCirculaire</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ boucle_economie_circulaire.id }}</td>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <td>{{ boucle_economie_circulaire.nom }}</td>
+            </tr>
+            <tr>
+                <th>Objectif</th>
+                <td>{{ boucle_economie_circulaire.objectif }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_boucle_economie_circulaire_index') }}">back to list</a>
+
+    <a href="{{ path('app_boucle_economie_circulaire_edit', {'id': boucle_economie_circulaire.id}) }}"class="btn btn-secondary"><i class="ti ti-settings"></i></a>
+
+    {{ include('boucle_economie_circulaire/_delete_form.html.twig') }}
+{% endblock %}

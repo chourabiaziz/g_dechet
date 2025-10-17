@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New ProduitRecycle{% endblock %}
+
+{% block body %}
+    <h1>Create new ProduitRecycle</h1>
+
+    {{ include('produit_recycle/_form.html.twig') }}
+
+    <a href="{{ path('app_produit_recycl__index') }}">back to list</a>
+{% endblock %}

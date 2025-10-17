@@ -1,0 +1,125 @@
+<!-- Top Strip -->
+<div class="app-topstrip bg-dark py-2 py-lg-3 px-3 px-lg-4 w-100 d-flex flex-column flex-lg-row align-items-center justify-content-between">
+    <!-- Left Side: Logo + Contact Info -->
+    <div class="d-flex flex-column flex-lg-row align-items-center gap-3 w-100 w-lg-auto justify-content-center justify-content-lg-start">
+      <!-- Logo -->
+    
+  
+  
+    </div>
+  
+    <!-- Right Side: Branding / Slogan (hidden on mobile) -->
+    <div class="d-none d-md-flex align-items-center justify-content-center mt-2 mt-md-0">
+       <a href="/" class="d-flex justify-content-center">
+        <img src="{{ asset('small-logo.png') }}" style="filter:   ;"
+  width="45" height="40" alt="{{ 'logo.alt'|trans }}" />
+      </a> <h3 class="text-linear-gradient mb-0 fs-5 text-uppercase fw-semibold text-center">
+         Ecocycle
+      </h3>
+    </div>
+  </div>
+  
+  <!-- Sidebar Start -->
+  <aside class="left-sidebar">
+      <div>
+          <div class="brand-logo d-flex align-items-center justify-content-between">
+             <h4><b>
+               <a href="/" class="text-nowrap logo-img">
+                  <img src="{{ asset('small-logo.png') }}"  width="50px" height="50px" alt="{{ 'logo.alt'|trans }}"/>
+                  <span style="font-weight: 900; font-family: 'Segoe UI', sans-serif; letter-spacing: 1px; 
+                       background: linear-gradient(135deg, #3498db, #2ecc71); 
+                       -webkit-background-clip: text; color: transparent; text-shadow: 0 0 6px rgba(0,0,0,0.2); 
+                       transition: text-shadow 0.3s ease;">
+                      Ecocycle
+                  </span>
+              </a></b></h4>
+              <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+                  <i class="ti ti-x fs-6"></i>
+              </div>
+          </div>
+  
+<nav class="sidebar-nav scroll-sidebar" data-simplebar>
+    <ul id="sidebarnav">
+        <li class="nav-small-cap">
+            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+            <span class="hide-menu">BackOffice</span>
+        </li>
+
+        {# Dashboard #}
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_dashboard') }}" aria-expanded="false">
+                <i class="ti ti-layout-dashboard"></i>
+                <span class="hide-menu">Dashboard</span>
+            </a>
+        </li>
+
+        {# Source #}
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_source_index') }}" aria-expanded="false">
+                <i class="ti ti-database"></i>
+                <span class="hide-menu">Source</span>
+            </a>
+        </li>
+
+        {# Déchet #}
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_dechet_index') }}" aria-expanded="false">
+                <i class="ti ti-trash"></i>
+                <span class="hide-menu">Déchet</span>
+            </a>
+        </li>
+
+        {# Infrastructure #}
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_infrastructure_index') }}" aria-expanded="false">
+                <i class="ti ti-building"></i>
+                <span class="hide-menu">Infrastructure</span>
+            </a>
+        </li>
+
+        {# Acteur #}
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_acteur_index') }}" aria-expanded="false">
+                <i class="ti ti-users"></i>
+                <span class="hide-menu">Acteurs</span>
+            </a>
+        </li>
+
+        {# Processus #}
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_processus_index') }}" aria-expanded="false">
+                <i class="ti ti-settings"></i>
+                <span class="hide-menu">Processus</span>
+            </a>
+        </li>
+
+        {# Produit Recycle #}
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_produit_recycl__index') }}" aria-expanded="false">
+                <i class="ti ti-package"></i>
+                <span class="hide-menu">Produit Recycle</span>
+            </a>
+        </li>
+
+        {# Boucle Économie Circulaire #}
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_boucle_economie_circulaire_index') }}" aria-expanded="false">
+                <i class="ti ti-repeat"></i>
+                <span class="hide-menu">Économie Circulaire</span>
+            </a>
+        </li>
+
+        {# Tracabilité #}
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_tracabilite_index') }}" aria-expanded="false">
+                <i class="ti ti-calendar"></i>
+                <span class="hide-menu">Tracabilité</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+
+      </div>
+  </aside>
+  

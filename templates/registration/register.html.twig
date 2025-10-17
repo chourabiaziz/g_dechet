@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="{{ app.request.locale }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ 'register' }}</title>
+  <link rel="shortcut icon" type="image/png" href="{{ asset('small-logo.png') }}"/>
+  <link rel="stylesheet" href="{{ asset('assets/css/styles.min.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --secondary: #2ecc71;
+      --secondary-dark: #27ae60;
+      --dark: #1a1a2e;
+      --darker: #16213e;
+      --darkest: #0f172a;
+      --light: #e2e8f0;
+      --lighter: #f8fafc;
+      --accent: #e74c3c;
+      --accent-dark: #c0392b;
+      --text: #cbd5e1;
+      --text-light: #94a3b8;
+      --text-dark: #1e293b;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+      --gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f172a 100%);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--gradient);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      z-index: -1;
+    }
+
+    .register-container {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .register-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 40px;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .register-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+    }
+
+    .register-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      transition: var(--transition);
+      border: 3px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+      border-color: var(--primary);
+    }
+
+    .logo-container h1 {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .logo-container p {
+      color: var(--text-light);
+      font-size: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 15px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--lighter);
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .input-with-icon {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      z-index: 2;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 14px 15px 14px 45px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+
+    .form-control::placeholder {
+      color: var(--text-light);
+    }
+
+    .phone-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .country-code {
+      flex: 0 0 120px;
+    }
+
+    .phone-input {
+      flex: 1;
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+
+    .password-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .terms-container {
+      display: flex;
+      align-items: flex-start;
+      margin: 25px 0;
+    }
+
+    .form-check-input {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      position: relative;
+      transition: var(--transition);
+      margin-right: 10px;
+      margin-top: 4px;
+    }
+
+    .form-check-input:checked {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .form-check-input:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .form-check-label {
+      color: var(--text);
+      font-size: 14px;
+      cursor: pointer;
+      line-height: 1.5;
+    }
+
+    .terms-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .terms-link:hover {
+      color: var(--secondary);
+    }
+
+    .btn-register {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-register:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-register:active {
+      transform: translateY(0);
+    }
+
+    .login-redirect {
+      text-align: center;
+      color: var(--text-light);
+      font-size: 14px;
+      margin-top: 25px;
+    }
+
+    .login-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .login-link:hover {
+      color: var(--secondary);
+    }
+
+    .error-message {
+      color: var(--accent);
+      font-size: 13px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .floating-animation {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      opacity: 0.05;
+      filter: blur(40px);
+      z-index: -1;
+      animation: float 15s infinite ease-in-out;
+    }
+
+    .floating-animation:nth-child(1) {
+      top: 10%;
+      left: 10%;
+      width: 150px;
+      height: 150px;
+      animation-delay: 0s;
+    }
+
+    .floating-animation:nth-child(2) {
+      bottom: 10%;
+      right: 10%;
+      width: 180px;
+      height: 180px;
+      animation-delay: 5s;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+      }
+      25% {
+        transform: translateY(-20px) translateX(10px);
+      }
+      50% {
+        transform: translateY(10px) translateX(-10px);
+      }
+      75% {
+        transform: translateY(-10px) translateX(-20px);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .register-card {
+        padding: 30px 25px;
+      }
+      
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .phone-group {
+        flex-direction: column;
+      }
+      
+      .country-code {
+        flex: 1;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+      
+      .register-card {
+        padding: 25px 20px;
+      }
+      
+      .logo {
+        width: 80px;
+        height: 80px;
+      }
+      
+      .logo-container h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Floating background elements -->
+  <div class="floating-animation"></div>
+  <div class="floating-animation"></div>
+
+<div class="register-container">
+  <div class="register-card">
+    <!-- Logo Section -->
+    <div class="logo-container">
+      <a href="/" class="d-inline-block">
+        <img src="{{ asset('small-logo.png') }}" alt="Logo" class="logo p-2">
+      </a>
+      <h1>Create an Account</h1>
+      <p>Please fill in your details to register</p>
+    </div>
+
+    <!-- Registration Form -->
+    {{ form_start(registrationForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+    <div class="form-row">
+      <div class="form-group">
+        {{ form_label(registrationForm.name, 'Last Name', {'label_attr': {'class': 'form-label'}}) }}
+        <div class="input-with-icon">
+          <span class="input-icon">👤</span>
+          {{ form_widget(registrationForm.name, {'attr': {'class': 'form-control', 'placeholder': 'Enter your last name'}}) }}
+        </div>
+        {{ form_errors(registrationForm.name) }}
+      </div>
+
+      <div class="form-group">
+        {{ form_label(registrationForm.prename, 'First Name', {'label_attr': {'class': 'form-label'}}) }}
+        <div class="input-with-icon">
+          <span class="input-icon">👤</span>
+          {{ form_widget(registrationForm.prename, {'attr': {'class': 'form-control', 'placeholder': 'Enter your first name'}}) }}
+        </div>
+        {{ form_errors(registrationForm.prename) }}
+      </div>
+    </div>
+
+     <div class="form-group">
+        <label class="form-label">{{ 'register.phone'|trans }}</label>
+        <div class="phone-group">
+          <div class="input-with-icon country-code">
+            <span class="input-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            {{ form_widget(registrationForm.countryCode, {'attr': {'class': 'form-control'}}) }}
+          </div>
+          <div class="input-with-icon phone-input">
+            <span class="input-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 16.92V19.92C22 20.52 21.49 21.02 20.88 21.06C20.33 21.09 19.79 21.12 19.25 21.12C10.73 21.12 3.62 14.01 3.62 5.49C3.62 4.95 3.65 4.41 3.68 3.86C3.72 3.25 4.22 2.74 4.82 2.74H7.82C8.34 2.74 8.79 3.12 8.85 3.64C8.88 3.97 8.91 4.3 8.94 4.62C9.12 6.56 9.55 8.44 10.21 10.22C10.35 10.64 10.2 11.11 9.84 11.38L8.58 12.33C9.95 15.31 12.43 17.79 15.41 19.16L16.36 17.9C16.63 17.54 17.1 17.39 17.52 17.53C19.3 18.19 21.18 18.62 23.12 18.8C23.44 18.83 23.77 18.86 24.1 18.89C24.62 18.95 25 19.4 25 19.92Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            {{ form_widget(registrationForm.phone, {'attr': {'class': 'form-control', 'placeholder': 'register.phone'|trans}}) }}
+          </div>
+        </div>
+        <div class="error-message">{{ form_errors(registrationForm.phone) }}</div>
+      </div>
+
+    <div class="form-group">
+      {{ form_label(registrationForm.email, 'Email Address', {'label_attr': {'class': 'form-label'}}) }}
+      <div class="input-with-icon">
+        <span class="input-icon">📧</span>
+        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Enter your email'}}) }}
+      </div>
+      {{ form_errors(registrationForm.email) }}
+    </div>
+
+    <div class="form-group">
+      {{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+      <div class="input-with-icon password-container">
+        <span class="input-icon">🔒</span>
+        {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': 'Enter your password', 'id': 'password-field'}}) }}
+        <button type="button" class="password-toggle" id="password-toggle">👁</button>
+      </div>
+      {{ form_errors(registrationForm.plainPassword) }}
+    </div>
+
+    <div class="terms-container">
+      {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+      <label class="form-check-label">
+        I agree to the <a href="/terms" class="terms-link">Terms of Service</a> and 
+        <a href="/policy" class="terms-link">Privacy Policy</a>.
+      </label>
+      {{ form_errors(registrationForm.agreeTerms) }}
+    </div>
+
+    <button type="submit" class="btn-register">
+      <span>Register</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 5L19 12L12 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    {{ form_end(registrationForm) }}
+
+    <div class="login-redirect">
+      Already have an account? <a href="{{ path('app_login') }}" class="login-link">Login</a>
+    </div>
+  </div>
+</div>
+
+
+  <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"></script>
+  <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+  
+  <script>
+    // Password visibility toggle
+    document.getElementById('password-toggle').addEventListener('click', function() {
+      const passwordField = document.getElementById('password-field');
+      const passwordIcon = document.getElementById('password-icon');
+      
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        passwordIcon.innerHTML = `
+          <path d="M17.94 17.94C16.2306 19.243 14.1491 19.9649 12 20C5 20 1 12 1 12C2.24389 9.6819 3.96914 7.65661 6.06 6.06M9.9 4.24C10.5883 4.07888 11.2931 3.99834 12 4C19 4 23 12 23 12C22.393 13.1356 21.6691 14.2047 20.84 15.19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M1 1L23 23" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        `;
+      } else {
+        passwordField.type = 'password';
+        passwordIcon.innerHTML = `
+          <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        `;
+      }
+    });
+    
+    // Form validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('.needs-validation');
+      
+      form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        
+        form.classList.add('was-validated');
+      });
+      
+      // Add focus effects to form inputs
+      const inputs = document.querySelectorAll('.form-control');
+      
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentNode.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+          this.parentNode.classList.remove('focused');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

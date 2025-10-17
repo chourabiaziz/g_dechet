@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New BoucleEconomieCirculaire{% endblock %}
+
+{% block body %}
+    <h1>Create new BoucleEconomieCirculaire</h1>
+
+    {{ include('boucle_economie_circulaire/_form.html.twig') }}
+
+    <a href="{{ path('app_boucle_economie_circulaire_index') }}">back to list</a>
+{% endblock %}

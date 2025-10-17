@@ -1,0 +1,226 @@
+   <nav class="navbar navbar-expand-lg navbar-light">
+        <ul class="navbar-nav">
+            <li class="nav-item d-block d-xl-none">
+                <a class="nav-link sidebartoggler" id="headerCollapse" href="javascript:void(0)">
+                    <i class="ti ti-menu-2"></i>
+                </a>
+            </li>
+
+            <!-- Notifications -->
+            <li class="nav-item dropdown">
+                <a class="nav-link" href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <iconify-icon icon="mdi:calendar-clock" class="fs-10"></iconify-icon>                    <div class="notification bg-primary rounded-circle"></div>
+                </a>
+                <div class="dropdown-menu dropdown-menu-animate-up" aria-labelledby="drop1">
+                    <div class="message-body">
+                        <a href="javascript:void(0)" class="dropdown-item">
+                          
+                            <div class="card mb-1 shadow-sm border-success">
+                                <div class="card-body">
+
+                                </div>
+                            </div>
+                    
+                        </a>
+                      
+                    </div>
+                </div>
+            </li>
+
+            <!-- Language Switcher -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{{ asset('flags/' ~ app.request.locale ~ '.png') }}" alt="Lang" width="24" height="16">
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                  
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" href="">
+                            <img src="{{ asset('flags/en.png') }}" width="24" height="16" alt="AR"> english
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <!-- User Profile -->
+        <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+            <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <h1 class="nav-link d-flex align-items-center justify-content-center rounded-circle bg-primary text-white" 
+                           style="width: 35px; height: 35px; text-decoration: none;">
+                            {{ app.user.name|slice(0,1) ~ app.user.prename|slice(0,1) }}
+                        </h1>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
+                        <div class="message-body">
+                            <a href="/user/{{ app.user.id }}/profile" class="d-flex align-items-center gap-2 dropdown-item">
+                                <i class="ti ti-user fs-6"></i>
+                                <p class="mb-0 fs-3">{{ 'header.my_profile'|trans }}</p>
+                            </a>
+                            
+                            <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                                <i class="ti ti-list-check fs-6"></i>
+                                <p class="mb-0 fs-3">{{ 'header.my_tasks'|trans }}</p>
+                            </a>
+                            <a href="/logout" class="btn btn-outline-primary mx-3 mt-2 d-block">{{ 'header.logout'|trans }}</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+
+<!-- JavaScript for Currency Selection -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Currency switcher functionality
+    const currencyOptions = document.querySelectorAll('.currency-option');
+    const currentCurrencyElement = document.getElementById('currentCurrency');
+    
+    // Initialize currency from localStorage or default to USD
+    function initializeCurrency() {
+        const savedCurrency = localStorage.getItem('userCurrency') || 'USD';
+        setActiveCurrency(savedCurrency);
+        
+        // Dispatch event for other parts of the application
+        document.dispatchEvent(new CustomEvent('currencyChanged', {
+            detail: { currency: savedCurrency }
+        }));
+    }
+    
+    // Set active currency
+    function setActiveCurrency(currency) {
+        // Update dropdown display
+        if (currentCurrencyElement) {
+            currentCurrencyElement.textContent = currency;
+        }
+        
+        // Update active state in dropdown
+        currencyOptions.forEach(option => {
+            if (option.getAttribute('data-currency') === currency) {
+                option.classList.add('active');
+                option.innerHTML = addCheckmark(option.innerHTML);
+            } else {
+                option.classList.remove('active');
+                option.innerHTML = removeCheckmark(option.innerHTML);
+            }
+        });
+        
+        // Save to localStorage
+        localStorage.setItem('userCurrency', currency);
+        
+        // Update page content based on selected currency
+        updatePageContent(currency);
+    }
+    
+    // Add checkmark to active currency
+    function addCheckmark(html) {
+        if (!html.includes('ti-check')) {
+            return html.replace('</div>', '<i class="ti ti-check ms-auto text-success"></i></div>');
+        }
+        return html;
+    }
+    
+    // Remove checkmark from currency
+    function removeCheckmark(html) {
+        return html.replace('<i class="ti ti-check ms-auto text-success"></i>', '');
+    }
+    
+    // Update page content based on currency
+    function updatePageContent(currency) {
+        // Update all price elements on the page
+        updatePrices(currency);
+        
+        // You can add more updates here based on the selected currency
+        console.log('Currency updated to:', currency);
+    }
+    
+    // Update prices throughout the application
+    function updatePrices(currency) {
+        const priceElements = document.querySelectorAll('[data-price-usd]');
+        priceElements.forEach(element => {
+            const usdPrice = parseFloat(element.getAttribute('data-price-usd'));
+            const convertedPrice = convertCurrency(usdPrice, currency);
+            const formattedPrice = formatCurrency(convertedPrice, currency);
+            element.textContent = formattedPrice;
+        });
+    }
+    
+    // Simple currency conversion (replace with real rates from your backend)
+    function convertCurrency(amount, toCurrency) {
+        const conversionRates = {
+            'USD': 1,
+            'EUR': 0.85,
+            'GBP': 0.73,
+            'TND': 3.10, // Example rate: 1 USD = 3.10 TND
+            'CAD': 1.25,
+            'AUD': 1.35,
+            'JPY': 110.50,
+            'CNY': 6.45
+        };
+        
+        return amount * (conversionRates[toCurrency] || 1);
+    }
+    
+    // Format currency based on type
+    function formatCurrency(amount, currency) {
+        const formatters = {
+            'USD': new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }),
+            'EUR': new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }),
+            'GBP': new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }),
+            'TND': new Intl.NumberFormat('ar-TN', { style: 'currency', currency: 'TND' }),
+            'CAD': new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }),
+            'AUD': new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }),
+            'JPY': new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }),
+            'CNY': new Intl.NumberFormat('zh-CN', { style: 'currency', currency: 'CNY' })
+        };
+        
+        return formatters[currency] ? formatters[currency].format(amount) : `${currency} ${amount.toFixed(2)}`;
+    }
+    
+    // Event listeners for currency options
+    currencyOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const selectedCurrency = this.getAttribute('data-currency');
+            setActiveCurrency(selectedCurrency);
+        });
+    });
+    
+    // Initialize on page load
+    initializeCurrency();
+});
+
+// You can also listen for currency changes in other parts of your application:
+document.addEventListener('currencyChanged', function(e) {
+    console.log('Currency changed to:', e.detail.currency);
+    // Add any global currency change handlers here
+});
+</script>
+
+<!-- Optional CSS for better styling -->
+<style>
+.currency-option.active {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    border-left: 3px solid var(--bs-primary);
+}
+
+.currency-option:hover {
+    background-color: var(--bs-light);
+}
+
+/* Mobile responsive */
+@media (max-width: 576px) {
+    .navbar-nav .nav-item.dropdown .dropdown-toggle span {
+        display: none !important;
+    }
+}
+
+/* Ensure checkmark alignment */
+.currency-option {
+    position: relative;
+}
+</style>

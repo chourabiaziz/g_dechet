@@ -1,0 +1,425 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'profile.title'|trans }}{% endblock %}
+
+{% block body %}
+     <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1 text-dark fw-bold">
+                        <i class="ti ti-user-circle me-2 text-primary"></i>{{ 'profile.title'|trans }}
+                    </h1>
+                    <p class="text-muted mb-0">{{ 'profile.subtitle'|trans({'%name%': user.name ~ ' ' ~ user.prename}) }}</p>
+                </div>
+                <div class="bg-primary bg-opacity-10 rounded-pill px-3 py-1">
+                    <span class="badge {% if user.isBlocked %}bg-danger{% else %}bg-success{% endif %}">
+                        <i class="ti ti-{% if user.isBlocked %}ban{% else %}circle-check{% endif %} me-1"></i>
+                        {% if user.isBlocked %}{{ 'profile.blocked'|trans }}{% else %}{{ 'profile.active'|trans }}{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- User Profile Card -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card profile-card border-0 shadow-sm h-100">
+                <!-- Card Header with Gradient -->
+                <div class="card-header bg-transparent border-0 pb-0 pt-4 px-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="profile-avatar bg-primary bg-opacity-10 rounded-3 p-3 me-3">
+                            <i class="ti ti-user text-primary fs-24"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="card-title mb-1 text-dark fw-bold">{{ user.name }} {{ user.prename }}</h4>
+                            <p class="text-muted mb-0">
+                                <i class="ti ti-star me-1 text-warning"></i>
+                                {{ user.specialty ?: 'No specialty' }}
+                            </p>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body pt-0 px-4 pb-4">
+                    <div class="row g-4">
+                        <!-- Personal Information -->
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <h6 class="section-title text-primary mb-3">
+                                    <i class="ti ti-id me-2"></i>{{ 'profile.personal_info'|trans }}
+                                </h6>
+                                <div class="info-item d-flex align-items-center mb-3">
+                                    <div class="info-icon bg-primary bg-opacity-10 rounded-2 p-2 me-3">
+                                        <i class="ti ti-mail text-primary fs-16"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">{{ 'profile.email'|trans }}</small>
+                                        <span class="fw-semibold text-dark">{{ user.email }}</span>
+                                    </div>
+                                </div>
+                                <div class="info-item d-flex align-items-center mb-3">
+                                    <div class="info-icon bg-success bg-opacity-10 rounded-2 p-2 me-3">
+                                        <i class="ti ti-phone text-success fs-16"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">{{ 'profile.phone'|trans }}</small>
+                                        <span class="fw-semibold text-dark">
+                                            {% if user.phone %}
+                                                <a href="tel:{{ user.phone }}" class="text-decoration-none">{{ user.phone }}</a>
+                                            {% else %}
+                                                <span class="text-muted">{{ 'profile.na'|trans }}</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="info-item d-flex align-items-center">
+                                    <div class="info-icon bg-info bg-opacity-10 rounded-2 p-2 me-3">
+                                        <i class="ti ti-calendar text-info fs-16"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">{{ 'profile.registration_date'|trans }}</small>
+                                        <span class="fw-semibold text-dark">
+                                            {{ user.registrationDate ? user.registrationDate|date('Y-m-d H:i') : '—' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Information -->
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <h6 class="section-title text-primary mb-3">
+                                    <i class="ti ti-shield me-2"></i>{{ 'profile.account_info'|trans }}
+                                </h6>
+                                <div class="info-item d-flex align-items-center mb-3">
+                                    <div class="info-icon bg-warning bg-opacity-10 rounded-2 p-2 me-3">
+                                        <i class="ti ti-crown text-warning fs-16"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">{{ 'profile.roles'|trans }}</small>
+                                        <span class="fw-semibold text-dark">
+                                            {% for role in user.roles %}
+                                                <span class="badge bg-primary bg-opacity-10 text-primary border-0 rounded-pill fs-11 me-1">
+                                                    {{ role|replace({'ROLE_': ''})|lower|title }}
+                                                </span>
+                                            {% endfor %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="info-item d-flex align-items-center mb-3">
+                                    <div class="info-icon bg-success bg-opacity-50 rounded-2 p-2 me-3">
+                                        <i class="ti ti-premium-rights text-black fs-16"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">{{ 'profile.current_plan'|trans }}</small>
+                                        <span class="fw-semibold text-dark">
+                                            {{ app.user.getLastPlanWithRemainingDays.plan.name }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="info-item d-flex align-items-center">
+                                    <div class="info-icon bg-danger bg-opacity-10 rounded-2 p-2 me-3">
+                                        <i class="ti ti-currency-dollar text-danger fs-16"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <small class="text-muted d-block">{{ 'profile.current_currency'|trans }}</small>
+                                        <span class="fw-semibold text-dark" id="current-currency">
+                                            {{ user.currency ? user.currency : '—' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>   <a class="btn btn-primary   align-items-center" href="{{ path('app_user_edit', {'id': user.id}) }}">
+                        <i class="ti ti-pencil me-2"></i> {{ 'profile.edit_profile'|trans }}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Currency Management Card -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card currency-card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 pb-0 pt-4 px-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="currency-icon bg-success bg-opacity-10 rounded-3 p-3 me-3">
+                            <i class="ti ti-currency-dollar text-success fs-20"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1 text-dark fw-bold">{{ 'profile.currency_settings'|trans }}</h5>
+                            <p class="text-muted mb-0 fs-14">{{ 'profile.currency_description'|trans }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pt-0 px-4 pb-4">
+                    <div class="mb-4">
+                        <label for="currency-input" class="form-label fw-semibold text-dark mb-3">
+                            <i class="ti ti-edit me-1 text-muted"></i>{{ 'profile.change_currency'|trans }}
+                        </label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="ti ti-currency-dollar text-muted"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control health-input border-start-0" 
+                                   id="currency-input" 
+                                   placeholder="{{ 'profile.currency_placeholder'|trans }}"
+                                   value="{{ user.currency ? user.currency : '' }}"
+                                   maxlength="3"
+                                   style="text-transform: uppercase;">
+                        </div>
+                        <div class="form-text text-muted mt-2">
+                            <i class="ti ti-info-circle me-1"></i>{{ 'profile.currency_help'|trans }}
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-success w-100 py-2 fw-semibold" id="save-currency">
+                        <i class="ti ti-check me-2"></i> {{ 'profile.save_currency'|trans }}
+                    </button>
+
+                    <!-- Popular Currencies -->
+                    <div class="popular-currencies mt-4">
+                        <h6 class="text-muted mb-3 fs-14">{{ 'profile.popular_currencies'|trans }}</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for currency in ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'TND'] %}
+                                <button type="button" class="btn btn-outline-primary btn-sm currency-suggestion" data-currency="{{ currency }}">
+                                    {{ currency }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+   
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const currencyInput = document.getElementById('currency-input');
+    const saveButton = document.getElementById('save-currency');
+    const currentCurrencySpan = document.getElementById('current-currency');
+    const currencySuggestions = document.querySelectorAll('.currency-suggestion');
+
+    // Auto-format currency input
+    currencyInput.addEventListener('input', function(e) {
+        this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').substring(0, 3);
+    });
+
+    // Currency suggestion buttons
+    currencySuggestions.forEach(button => {
+        button.addEventListener('click', function() {
+            currencyInput.value = this.getAttribute('data-currency');
+            currencyInput.focus();
+        });
+    });
+
+    async function saveCurrency() {
+        const currency = currencyInput.value.trim();
+        
+        if (!currency) {
+            showToast('error', '{{ "profile.error_title"|trans }}', '{{ "profile.enter_currency"|trans }}');
+            currencyInput.focus();
+            return;
+        }
+
+        if (!/^[A-Z]{3}$/.test(currency)) {
+            showToast('error', '{{ "profile.error_title"|trans }}', '{{ "profile.invalid_currency"|trans }}');
+            currencyInput.focus();
+            return;
+        }
+
+        // Save button loading state
+        saveButton.disabled = true;
+        const originalText = saveButton.innerHTML;
+        saveButton.innerHTML = '<i class="ti ti-loader me-2 animated-spin"></i> {{ "profile.saving"|trans }}...';
+
+        try {
+            const response = await fetch('/customer/change-currency/to/new', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ currency: currency })
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast('success', '{{ "profile.success"|trans }}', data.message);
+                currentCurrencySpan.textContent = data.currency;
+                currencyInput.value = data.currency;
+                
+                // Add success animation
+                currentCurrencySpan.classList.add('text-success', 'fw-bold');
+                setTimeout(() => {
+                    currentCurrencySpan.classList.remove('text-success', 'fw-bold');
+                }, 2000);
+            } else {
+                showToast('error', '{{ "profile.error_title"|trans }}', data.message || '{{ "profile.failed_update"|trans }}');
+            }
+
+        } catch (error) {
+            console.error('Currency update error:', error);
+            showToast('error', '{{ "profile.error_title"|trans }}', '{{ "profile.unexpected_error"|trans }}');
+        } finally {
+            saveButton.disabled = false;
+            saveButton.innerHTML = originalText;
+        }
+    }
+
+    // Event listeners
+    saveButton.addEventListener('click', saveCurrency);
+    currencyInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') saveCurrency();
+    });
+
+    // Auto-focus if empty
+    if (!currencyInput.value) {
+        setTimeout(() => currencyInput.focus(), 300);
+    }
+});
+</script>
+
+<style>
+.profile-card, .currency-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.profile-card:hover, .currency-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.profile-avatar {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.currency-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-section {
+    padding: 1rem 0;
+}
+
+.section-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(13, 110, 253, 0.1);
+    padding-bottom: 0.5rem;
+}
+
+.info-item {
+    padding: 0.5rem 0;
+}
+
+.info-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fs-11 { font-size: 0.6875rem !important; }
+.fs-14 { font-size: 0.875rem !important; }
+.fs-16 { font-size: 1rem !important; }
+.fs-20 { font-size: 1.25rem !important; }
+.fs-24 { font-size: 1.5rem !important; }
+
+.health-input {
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.health-input:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+}
+
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.currency-suggestion {
+    border-radius: 8px;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+}
+
+.currency-suggestion:hover {
+    background-color: #0d6efd;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.popular-currencies {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 1rem;
+}
+
+.animated-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.bg-purple {
+    background-color: #6f42c1 !important;
+}
+
+.text-purple {
+    color: #6f42c1 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-avatar {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .currency-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .fs-24 {
+        font-size: 1.25rem !important;
+    }
+}
+</style>
+{% endblock %}

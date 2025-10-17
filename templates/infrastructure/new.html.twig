@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Infrastructure{% endblock %}
+
+{% block body %}
+    <h1>Create new Infrastructure</h1>
+
+    {{ include('infrastructure/_form.html.twig') }}
+
+    <a href="{{ path('app_infrastructure_index') }}">back to list</a>
+{% endblock %}

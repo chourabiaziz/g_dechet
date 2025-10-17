@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit ProduitRecycle{% endblock %}
+
+{% block body %}
+    <h1>Edit ProduitRecycle</h1>
+
+    {{ include('produit_recycle/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_produit_recycl__index') }}">back to list</a>
+
+    {{ include('produit_recycle/_delete_form.html.twig') }}
+{% endblock %}

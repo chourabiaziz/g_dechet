@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Tracabilite{% endblock %}
+
+{% block body %}
+    <h1>Create new Tracabilite</h1>
+
+    {{ include('tracabilite/_form.html.twig') }}
+
+    <a href="{{ path('app_tracabilite_index') }}">back to list</a>
+{% endblock %}

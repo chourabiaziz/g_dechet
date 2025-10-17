@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Source{% endblock %}
+
+{% block body %}
+    <h1>Source</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ source.id }}</td>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <td>{{ source.nom }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ source.type }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_source_index') }}">back to list</a>
+
+    <a href="{{ path('app_source_edit', {'id': source.id}) }}"class="btn btn-secondary"><i class="ti ti-settings"></i></a>
+
+    {{ include('source/_delete_form.html.twig') }}
+{% endblock %}

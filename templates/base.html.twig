@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Coach-Bording{% endblock %}</title>
+    <link rel="shortcut icon" type="image/png" href="{{ asset('small-logo.png') }}"/>
+    <link rel="stylesheet" href="{{ asset('assets/css/styles.min.css') }}"/>
+    
+    <style>
+        /* Styles pour les pages d'erreur uniquement (design login) */
+        .error-page {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: #cbd5e1;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f172a 100%);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .error-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: -1;
+        }
+
+        .error-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .error-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .error-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+        }
+
+        .error-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            border-color: #3498db;
+        }
+
+        .logo-container h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .error-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e74c3c;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .error-message {
+            color: #94a3b8;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .plan-details {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .plan-details h5 {
+            color: #f8fafc;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .countdown-container {
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .countdown-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .countdown-timer {
+            font-size: 2rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 12px 24px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+            color: white;
+        }
+
+        .btn-success-custom {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 12px 24px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3);
+            color: white;
+        }
+
+        .btn-danger-custom {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 12px 24px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-danger-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(231, 76, 60, 0.3);
+            color: white;
+        }
+
+        .alert-custom {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 10px;
+            color: #cbd5e1;
+            padding: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+
+        .status-active {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .status-upcoming {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .status-expired {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Floating Animations pour les pages d'erreur uniquement */
+        .floating-animation {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            opacity: 0.05;
+            filter: blur(40px);
+            z-index: -1;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .floating-animation:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            width: 150px;
+            height: 150px;
+            animation-delay: 0s;
+        }
+
+        .floating-animation:nth-child(2) {
+            bottom: 10%;
+            right: 10%;
+            width: 180px;
+            height: 180px;
+            animation-delay: 5s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            50% {
+                transform: translateY(10px) translateX(-10px);
+            }
+            75% {
+                transform: translateY(-10px) translateX(-20px);
+            }
+        }
+
+        /* Styles pour les toasts (inchangés) */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .custom-toast {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .toast-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .toast-error {
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+            color: white;
+        }
+
+        .toast-warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: #212529;
+        }
+
+        .toast-info {
+            background: linear-gradient(135deg, #17a2b8, #6f42c1);
+            color: white;
+        }
+
+        .toast-header {
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: inherit;
+        }
+
+        .toast-body {
+            padding: 12px 16px;
+            font-weight: 500;
+        }
+
+        .btn-close {
+            filter: invert(1);
+            opacity: 0.8;
+        }
+
+        .btn-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.show {
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .error-card {
+                padding: 30px 25px;
+            }
+            
+            .logo {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .logo-container h1 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .error-card {
+                padding: 25px 20px;
+            }
+            
+            .btn-gradient,
+            .btn-success-custom,
+            .btn-danger-custom {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    .pagination-container {
+		text-align: center;
+		margin-top: 20px;
+	}
+	
+	.pagination {
+		list-style: none;
+		padding: 0;
+		display: flex;
+		justify-content: center;
+		gap: 8px;
+	}
+	
+	.pagination-item {
+		display: inline-block;
+	}
+	
+	.pagination-link {
+		display: block;
+		padding: 8px 12px;
+		text-decoration: none;
+		color:rgb(0, 25, 51);
+		border: 1px solid rgb(0, 25, 51);
+		border-radius: 5px;
+		transition: all 0.3s ease-in-out;
+	}
+	
+	.pagination-link:hover {
+		background-color: rgb(0, 25, 51);
+		color: white;
+	}
+	
+	.pagination-item.active .pagination-link {
+		background-color: rgb(0, 25, 51);
+		color: white;
+		font-weight: bold;
+	}
+	
+	.prev, .next {
+		font-weight: bold;
+	}
+	</style>
+	
+</head>
+
+  
+
+<body   >
+    
+ 
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    {# Vérification du statut de l'utilisateur #}
+        
+ 
+            <!-- UTILISATEUR NORMAL - DESIGN STANDARD -->
+            <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
+                {% include '_sidebar.html.twig' %}
+                <div class="body-wrapper">
+                    {% include '_header.html.twig' %}
+                    <div class="body-wrapper-inner">
+                        <div class="container p-5">
+                            <div class="toast-container" id="toastContainer"></div>
+                            {{ block('body') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+ 
+     
+
+    <!-- Le reste du code JavaScript reste inchangé -->
+    <!-- ... (scripts identiques à votre code original) ... -->
+<!-- Bootstrap Bundle -->
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Tabler Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+
+
+ 
+<!-- Librairies de base -->
+<script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('assets/libs/simplebar/dist/simplebar.js') }}"></script>
+{% endblock %}
+<!-- Framework principal -->
+<script src="{{ asset('assets/js/app.min.js') }}"></script>
+<script src="{{ asset('assets/js/sidebarmenu.js') }}"></script>
+
+<!-- Librairies externes -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+
+		<script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+		<script src="{{ asset('assets/js/app.min.js') }}"></script>
+		<script src="{{ asset('assets/js/app.min.js') }}"></script>
+		<script src="{{ asset('assets/libs/simplebar/dist/simplebar.js') }}"></script>
+		<!-- solar icons -->
+		<script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+		<script src="{{ asset('assets/js/sidebarmenu.js') }}"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+		<script>
+			// Fonction pour afficher les toasts
+			function showToast(type, title, message, duration = 5000) {
+				const toastContainer = document.getElementById('toastContainer');
+				
+				const icons = {
+					'success': '✓',
+					'error': '⚠',
+					'warning': '⚠',
+					'info': 'ℹ'
+				};
+
+				const titlesMap = {
+					'success': 'Succès',
+					'error': 'Erreur',
+					'warning': 'Attention',
+					'info': 'Information'
+				};
+
+				const toastId = 'toast-' + Date.now();
+				const toastHtml = `
+					<div id="${toastId}" class="toast custom-toast toast-${type}" role="alert" data-bs-delay="${duration}">
+						<div class="toast-header">
+							<strong class="me-auto">
+								<span style="margin-right: 8px;">${icons[type]}</span>
+								${title || titlesMap[type]}
+							</strong>
+							<small class="text-muted">à l'instant</small>
+							<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+						</div>
+						<div class="toast-body">
+							${message}
+						</div>
+					</div>
+				`;
+
+				toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+				
+				const toastElement = document.getElementById(toastId);
+				const toast = new bootstrap.Toast(toastElement);
+				
+				toastElement.addEventListener('hidden.bs.toast', function () {
+					this.remove();
+				});
+
+				toast.show();
+			}
+
+			// Fonction de compte à rebours
+			function startCountdown(startDate) {
+				const countdownElement = document.getElementById('countdownTimer');
+				if (!countdownElement) return;
+
+				function updateCountdown() {
+					const now = new Date().getTime();
+					const startTime = new Date(startDate).getTime();
+					const distance = startTime - now;
+
+					if (distance < 0) {
+						countdownElement.innerHTML = '<div class="countdown-finished">Plan Started! <br>Page will refresh...</div>';
+						setTimeout(() => {
+							window.location.reload();
+						}, 3000);
+						return;
+					}
+
+					// Calcul du temps restant
+					const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+					const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+					const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+					const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+					// Formatage de l'affichage
+					let countdownText = '';
+					if (days > 0) {
+						countdownText += `${days}d `;
+					}
+					countdownText += `${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+
+					countdownElement.textContent = countdownText;
+				}
+
+				// Mise à jour immédiate puis toutes les secondes
+				updateCountdown();
+				setInterval(updateCountdown, 1000);
+			}
+
+			// Initialisation au chargement de la page
+			document.addEventListener('DOMContentLoaded', function() {
+				// Messages flash Symfony
+				{% for type, messages in app.flashes %}
+					{% for message in messages %}
+						showToast('{{ type }}', '', '{{ message|raw }}');
+					{% endfor %}
+				{% endfor %}
+
+				// CORRECTION : Démarrer le compte à rebours si nécessaire
+ 
+				{% if countdownData is defined and countdownData is not null and countdownData.enabled %}
+    startCountdown('{{ countdownData.startDate }}');
+{% endif %}
+
+				// Fonction globale
+				window.showToast = showToast;
+			});
+
+			// Gestion des erreurs AJAX globales
+			$(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
+				if (jqXHR.status === 500) {
+					showToast('error', 'Erreur serveur', 'Une erreur est survenue lors de la requête.');
+				} else if (jqXHR.status === 404) {
+					showToast('error', 'Non trouvé', 'La ressource demandée n\'a pas été trouvée.');
+				} else if (jqXHR.status === 403) {
+					showToast('error', 'Accès refusé', 'Vous n\'avez pas les permissions nécessaires.');
+				}
+			});
+		</script>
+ 	
+{% if app.user and app.user.isBlocked %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast('error', 'Compte bloqué', 'Votre compte a été bloqué. Veuillez contacter l\'administrateur.', 10000);
+
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            overlay.style.zIndex = '999999';
+            overlay.style.cursor = 'not-allowed';
+            document.body.appendChild(overlay);
+
+            document.body.addEventListener('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }, true);
+
+            document.body.addEventListener('keydown', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }, true);
+        });
+    </script>
+{% endif %}
+
+
+
+
+
+
+
+
+	
+
+<noscript>
+	<meta http-equiv="refresh" content="0;url=/no-js" />
+  </noscript>
+
+  
+  
+
+	</body>
+</html>

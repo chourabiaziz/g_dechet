@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Processus{% endblock %}
+
+{% block body %}
+    <h1>Processus</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ processu.id }}</td>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <td>{{ processu.nom }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ processu.type }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_processus_index') }}">back to list</a>
+
+    <a href="{{ path('app_processus_edit', {'id': processu.id}) }}"class="btn btn-secondary"><i class="ti ti-settings"></i></a>
+
+    {{ include('processus/_delete_form.html.twig') }}
+{% endblock %}

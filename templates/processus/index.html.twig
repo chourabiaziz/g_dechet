@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Processus index{% endblock %}
+
+{% block body %}
+    <h1>Processus index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for processu in processuses %}
+            <tr>
+                <td>{{ processu.id }}</td>
+                <td>{{ processu.nom }}</td>
+                <td>{{ processu.type }}</td>
+                <td>
+                    <a href="{{ path('app_processus_show', {'id': processu.id}) }}"class="btn btn-info"><i class="ti ti-eye"></i></a>
+                    <a href="{{ path('app_processus_edit', {'id': processu.id}) }}"class="btn btn-secondary"><i class="ti ti-settings"></i></a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_processus_new') }}"class="btn btn-success">Create new</a>
+{% endblock %}
