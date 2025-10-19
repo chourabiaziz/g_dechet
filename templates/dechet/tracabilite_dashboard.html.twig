@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de Bord Traçabilité{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">📊 Tableau de Bord - Traçabilité</h1>
+
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body text-center">
+                    <h3>{{ stats.total }}</h3>
+                    <p>Total Déchets</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body text-center">
+                    <h3>{{ stats.avec_tracabilite }}</h3>
+                    <p>Avec Traçabilité</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info">
+                <div class="card-body text-center">
+                    <h3>{{ stats.avec_produit_recycle }}</h3>
+                    <p>Produits Recyclés</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Derniers déchets -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Historique des Déchets Récents</h5>
+        </div>
+        <div class="card-body">
+            {% if derniers_dechets|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Quantité</th>
+                            <th>État</th>
+                            <th>Processus</th>
+                            <th>Produit Recyclé</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dechet in derniers_dechets %}
+                        <tr>
+                            <td>{{ dechet.id }}</td>
+                            <td>{{ dechet.type }}</td>
+                            <td>{{ dechet.quantite }} kg</td>
+                            <td>
+                                <span class="badge 
+                                    {% if dechet.etat == 'declare' %}bg-warning
+                                    {% elseif dechet.etat == 'en_processus' %}bg-info
+                                    {% elseif dechet.etat == 'transforme' %}bg-success
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ dechet.etat }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if dechet.processuses|length > 0 %}
+                                    {{ dechet.processuses|first.nom }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if dechet.produitrecycle %}
+                                    <span class="badge bg-success">{{ dechet.produitrecycle.nom }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ path('app_dechet_tracabilite_view', {'id': dechet.id}) }}" 
+                                   class="btn btn-sm btn-primary">
+                                    📊 Traçabilité
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <p class="text-muted">Aucun déchet trouvé.</p>
+                <a href="{{ path('app_dechet_declaration') }}" class="btn btn-success">
+                    📝 Commencer par déclarer un déchet
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{{ path('app_dechet_workflow') }}" class="btn btn-secondary">
+            ← Retour au workflow
+        </a>
+        <a href="{{ path('app_dechet_dashboard') }}" class="btn btn-info">
+            📊 Tableau de bord principal
+        </a>
+    </div>
+</div>
+{% endblock %}

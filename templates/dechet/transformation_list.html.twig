@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Déchets à Transformer{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">🔄 Déchets à Transformer</h1>
+
+    {% if dechets|length > 0 %}
+    <div class="card">
+        <div class="card-header">
+            <h5>{{ dechets|length }} déchet(s) prêt(s) pour la transformation</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Quantité</th>
+                            <th>Processus</th>
+                            <th>Date Assignation</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dechet in dechets %}
+                        <tr>
+                            <td>{{ dechet.id }}</td>
+                            <td>{{ dechet.type }}</td>
+                            <td>{{ dechet.quantite }} kg</td>
+                            <td>
+                                {% if dechet.processuses|length > 0 %}
+                                    {% for processus in dechet.processuses %}
+                                        <span class="badge bg-info">{{ processus.nom }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted">Aucun</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ dechet.dateProduction|date('d/m/Y H:i') }}</td>
+                            <td>
+                                <a href="{{ path('app_dechet_transformation', {'id': dechet.id}) }}" 
+                                   class="btn btn-sm btn-success">
+                                    🔄 Transformer
+                                </a>
+                                <a href="{{ path('app_dechet_tracabilite_view', {'id': dechet.id}) }}" 
+                                   class="btn btn-sm btn-outline-info">
+                                    📊 Voir
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <h4>📋 Aucun déchet prêt pour la transformation</h4>
+        <p>Les déchets doivent d'abord être assignés à des processus.</p>
+        <a href="{{ path('app_dechet_processus_list') }}" class="btn btn-primary">
+            ⚙️ Voir les déchets à assigner
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="mt-3">
+        <a href="{{ path('app_dechet_workflow') }}" class="btn btn-secondary">
+            ← Retour au workflow
+        </a>
+        <a href="{{ path('app_dechet_dashboard') }}" class="btn btn-info">
+            📊 Tableau de bord
+        </a>
+    </div>
+</div>
+{% endblock %}

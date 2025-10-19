@@ -1,0 +1,282 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Transformation du Déchet #{{ dechet.id }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-warning text-dark py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="ti ti-refresh me-3 fs-2"></i>
+                        <div>
+                            <h2 class="h4 mb-0">Étape 3: Transformation du Déchet</h2>
+                            <p class="mb-0 opacity-75">Créez un produit recyclé à partir du déchet</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <!-- Informations du déchet -->
+                    <div class="dechet-info mb-4 p-4 bg-light rounded-3 border-start border-4 border-warning">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="ti ti-info-circle me-2 text-warning fs-5"></i>
+                            <h5 class="mb-0 fw-bold">Déchet à transformer</h5>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-sm-6 col-md-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="ti ti-id me-2 text-muted"></i>
+                                    <div>
+                                        <small class="text-muted">ID</small>
+                                        <div class="fw-bold">#{{ dechet.id }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="ti ti-tag me-2 text-muted"></i>
+                                    <div>
+                                        <small class="text-muted">Type</small>
+                                        <div class="fw-bold text-capitalize">{{ dechet.type }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="ti ti-scale me-2 text-muted"></i>
+                                    <div>
+                                        <small class="text-muted">Quantité</small>
+                                        <div class="fw-bold">{{ dechet.quantite }} kg</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="ti ti-circle-dot me-2 text-muted"></i>
+                                    <div>
+                                        <small class="text-muted">État</small>
+                                        <div>
+                                            <span class="badge bg-info fs-6">{{ dechet.etat }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% if dechet.processuses|length > 0 %}
+                        <div class="mt-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="ti ti-settings me-2 text-muted"></i>
+                                <small class="text-muted">Processus assignés</small>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for processus in dechet.processuses %}
+                                    <span class="badge bg-primary fs-6 p-2">
+                                        <i class="ti ti-check me-1"></i>
+                                        {{ processus.nom }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Formulaire de transformation -->
+                    {% if dechet.processuses|length > 0 %}
+                        <form method="post" class="needs-validation" novalidate>
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="nom_produit" name="nom_produit" 
+                                               placeholder=" " required
+                                               value="Produit recyclé from {{ dechet.type }}">
+                                        <label for="nom_produit">
+                                            <i class="ti ti-tag me-2 text-primary"></i>
+                                            Nom du produit recyclé
+                                        </label>
+                                        <div class="form-text mt-2">
+                                            <i class="ti ti-help me-1"></i>
+                                            Donnez un nom descriptif au produit recyclé
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="type_produit" name="type_produit" required>
+                                            <option value="">Choisir un type...</option>
+                                            <option value="matiere_premiere">Matière première</option>
+                                            <option value="produit_fini">Produit fini</option>
+                                            <option value="compost">Compost</option>
+                                            <option value="granules">Granulés</option>
+                                            <option value="energie">Énergie</option>
+                                            <option value="autre">Autre</option>
+                                        </select>
+                                        <label for="type_produit">
+                                            <i class="ti ti-category me-2 text-primary"></i>
+                                            Type de produit
+                                        </label>
+                                        <div class="form-text mt-2">
+                                            <i class="ti ti-help me-1"></i>
+                                            Sélectionnez le type de produit recyclé
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning border-0">
+                                <div class="d-flex">
+                                    <i class="ti ti-alert-triangle me-3 fs-5 text-warning"></i>
+                                    <div>
+                                        <h6 class="alert-heading mb-2">Action importante</h6>
+                                        <p class="mb-0">
+                                            En validant cette transformation, le déchet sera marqué comme "transformé" 
+                                            et un nouveau produit recyclé sera créé dans le système.
+                                            <strong class="d-block mt-1">Cette action est irréversible.</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-3 mt-4 pt-3 border-top">
+                                <button type="submit" class="btn btn-success btn-lg px-4">
+                                    <i class="ti ti-check me-2"></i>
+                                    Valider la Transformation
+                                </button>
+                                <a href="{{ path('app_dechet_transformation_list') }}" class="btn btn-outline-secondary btn-lg px-4">
+                                    <i class="ti ti-arrow-left me-2"></i>
+                                    Retour à la liste
+                                </a>
+                                <a href="{{ path('app_dechet_tracabilite_view', {'id': dechet.id}) }}" class="btn btn-outline-info btn-lg px-4">
+                                    <i class="ti ti-chart-bar me-2"></i>
+                                    Voir la traçabilité
+                                </a>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-danger border-0 text-center py-4">
+                            <i class="ti ti-alert-triangle fs-1 text-danger mb-3 d-block"></i>
+                            <h5 class="fw-bold">Action impossible</h5>
+                            <p class="mb-3">
+                                Vous ne pouvez pas transformer ce déchet car aucun processus n'a été assigné.
+                                Veuillez d'abord assigner un processus de traitement.
+                            </p>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <a href="{{ path('app_dechet_processus_assign', {'id': dechet.id}) }}" class="btn btn-primary btn-lg px-4">
+                                    <i class="ti ti-settings me-2"></i>
+                                    Assigner un processus
+                                </a>
+                                <a href="{{ path('app_dechet_transformation_list') }}" class="btn btn-outline-secondary btn-lg px-4">
+                                    <i class="ti ti-arrow-left me-2"></i>
+                                    Retour à la liste
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nomProduitInput = document.getElementById('nom_produit');
+    const typeProduitSelect = document.getElementById('type_produit');
+    
+    // Suggestions automatiques basées sur le type de déchet
+    const dechetType = "{{ dechet.type }}";
+    const suggestions = {
+        'plastique': { nom: 'Granulés plastiques', type: 'matiere_premiere' },
+        'metal': { nom: 'Lingots métalliques', type: 'matiere_premiere' },
+        'verre': { nom: 'Calcin de verre', type: 'matiere_premiere' },
+        'papier_carton': { nom: 'Pâte à papier recyclée', type: 'matiere_premiere' },
+        'organique': { nom: 'Compost organique', type: 'compost' },
+        'electronique': { nom: 'Métaux précieux', type: 'matiere_premiere' },
+        'dangereux': { nom: 'Matière stabilisée', type: 'matiere_premiere' },
+        'autre': { nom: 'Produit recyclé', type: 'autre' }
+    };
+    
+    // Application des suggestions
+    if (suggestions[dechetType] && nomProduitInput.value.includes('from')) {
+        nomProduitInput.value = suggestions[dechetType].nom;
+        typeProduitSelect.value = suggestions[dechetType].type;
+    }
+    
+    // Validation du formulaire
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let valid = true;
+            
+            // Validation nom produit
+            if (!nomProduitInput.value.trim()) {
+                valid = false;
+                nomProduitInput.classList.add('is-invalid');
+                const errorDiv = nomProduitInput.parentNode.querySelector('.invalid-feedback') || document.createElement('div');
+                errorDiv.className = 'invalid-feedback';
+                errorDiv.innerHTML = '<i class="ti ti-alert-circle me-1"></i>Veuillez saisir un nom pour le produit recyclé.';
+                if (!nomProduitInput.parentNode.querySelector('.invalid-feedback')) {
+                    nomProduitInput.parentNode.appendChild(errorDiv);
+                }
+            } else {
+                nomProduitInput.classList.remove('is-invalid');
+            }
+            
+            // Validation type produit
+            if (!typeProduitSelect.value) {
+                valid = false;
+                typeProduitSelect.classList.add('is-invalid');
+                const errorDiv = typeProduitSelect.parentNode.querySelector('.invalid-feedback') || document.createElement('div');
+                errorDiv.className = 'invalid-feedback';
+                errorDiv.innerHTML = '<i class="ti ti-alert-circle me-1"></i>Veuillez sélectionner un type de produit.';
+                if (!typeProduitSelect.parentNode.querySelector('.invalid-feedback')) {
+                    typeProduitSelect.parentNode.appendChild(errorDiv);
+                }
+            } else {
+                typeProduitSelect.classList.remove('is-invalid');
+            }
+            
+            if (!valid) {
+                e.preventDefault();
+                // Scroll to first error
+                const firstError = document.querySelector('.is-invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.card {
+    border-radius: 15px;
+}
+.dechet-info {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+}
+.btn-success {
+    background: linear-gradient(135deg, #198754 0%, #157347 100%);
+    border: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+.btn-success:hover {
+    background: linear-gradient(135deg, #157347 0%, #0f5132 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(25, 135, 84, 0.3);
+}
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: #0d6efd;
+    font-weight: 500;
+}
+</style>
+{% endblock %}

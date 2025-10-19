@@ -48,6 +48,7 @@ class Dechet
 
     public function __construct()
     {
+        $this->dateProduction = new \DateTime();
         $this->processuses = new ArrayCollection();
     }
 

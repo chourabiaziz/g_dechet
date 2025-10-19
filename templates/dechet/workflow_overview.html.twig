@@ -1,0 +1,427 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Workflow Gestion des Déchets{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">
+                        <i class="ti ti-recycle text-primary me-2"></i>
+                        Workflow de Gestion des Déchets
+                    </h1>
+                    <p class="text-muted mb-0">Suivez le parcours complet de vos déchets vers le recyclage</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ path('app_dechet_dashboard') }}" class="btn btn-outline-primary">
+                        <i class="ti ti-dashboard me-1"></i>
+                        Tableau de Bord
+                    </a>
+                    <a href="{{ path('app_dechet_declaration') }}" class="btn btn-success">
+                        <i class="ti ti-plus me-1"></i>
+                        Nouvelle Déclaration
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cartes de statistiques -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-primary border-4 shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">
+                                Total Déchets
+                            </div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">
+                                {{ stats.total ?? 0 }}
+                            </div>
+                            <div class="text-xs text-muted mt-1">
+                                <i class="ti ti-trending-up text-success me-1"></i>
+                                {{ stats.moyenne_quantite|number_format(2) }} kg en moyenne
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ti ti-trash text-primary fs-8"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-warning border-4 shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-warning text-uppercase mb-1">
+                                Déclarés
+                            </div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">
+                                {{ stats.declares ?? 0 }}
+                            </div>
+                            <div class="text-xs text-muted mt-1">
+                                En attente de traitement
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ti ti-file-alert text-warning fs-8"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-info border-4 shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-info text-uppercase mb-1">
+                                En Processus
+                            </div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">
+                                {{ stats.en_processus ?? 0 }}
+                            </div>
+                            <div class="text-xs text-muted mt-1">
+                                En cours de traitement
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ti ti-settings text-info fs-8"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-success border-4 shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                                Transformés
+                            </div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">
+                                {{ stats.transformes ?? 0 }}
+                            </div>
+                            <div class="text-xs text-muted mt-1">
+                                Recyclage terminé
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ti ti-check text-success fs-8"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Étapes du Workflow -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="ti ti-road me-2 text-primary"></i>
+                        Parcours de Gestion des Déchets
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for etape in etapes %}
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="workflow-step card h-100 border-0 shadow-sm transition-all">
+                                <div class="card-body text-center p-4">
+                                    <div class="step-icon mb-3">
+                                        <i class="{{ etape.icon }} fs-1 text-primary"></i>
+                                    </div>
+                                    <h6 class="card-title fw-bold mb-2">{{ etape.nom }}</h6>
+                                    <p class="text-muted small mb-3">
+                                        {% if loop.index == 1 %}Déclaration initiale des déchets
+                                        {% elseif loop.index == 2 %}Assignation aux processus de traitement
+                                        {% elseif loop.index == 3 %}Transformation en produits recyclés
+                                        {% else %}Suivi et traçabilité complète{% endif %}
+                                    </p>
+                                    <a href="{{ path(etape.route) }}" class="btn btn-outline-primary btn-sm stretched-link">
+                                        <i class="ti ti-arrow-right me-1"></i>
+                                        Accéder
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphiques -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="card-title mb-0">
+                                <i class="ti ti-chart-pie me-2 text-info"></i>
+                                Répartition par État
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="etatChart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="card-title mb-0">
+                                <i class="ti ti-chart-line me-2 text-success"></i>
+                                Évolution Mensuelle
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="monthlyChart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar avec actions rapides -->
+        <div class="col-lg-4">
+            <!-- Accès rapide -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="card-title mb-0">
+                        <i class="ti ti-zap me-2 text-warning"></i>
+                        Accès Rapide
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_dechet_liste_etat', {'etat': 'declare'}) }}" class="btn btn-outline-warning text-start">
+                            <i class="ti ti-file-alert me-2"></i>
+                            Déchets Déclarés
+                            <span class="badge bg-warning float-end">{{ stats.declares ?? 0 }}</span>
+                        </a>
+                        <a href="{{ path('app_dechet_liste_etat', {'etat': 'en_processus'}) }}" class="btn btn-outline-info text-start">
+                            <i class="ti ti-settings me-2"></i>
+                            En Processus
+                            <span class="badge bg-info float-end">{{ stats.en_processus ?? 0 }}</span>
+                        </a>
+                        <a href="{{ path('app_dechet_liste_etat', {'etat': 'transforme'}) }}" class="btn btn-outline-success text-start">
+                            <i class="ti ti-check "></i>
+                            Transformés
+                            <span class="badge bg-success float-end">{{ stats.transformes ?? 0 }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Efficacité -->
+            <div class="card shadow">
+                <div class="card-header bg-white py-3">
+                    <h6 class="card-title mb-0">
+                        <i class="ti ti-trophy me-2 text-success"></i>
+                        Efficacité du Recyclage
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-3">
+                        <div class="position-relative d-inline-block">
+                            <canvas id="efficiencyGauge" width="120" height="120"></canvas>
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <span class="h4 fw-bold" id="efficiencyValue">0%</span>
+                            </div>
+                        </div>
+                        <p class="text-muted mt-3 mb-0">
+                            Taux de transformation des déchets
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dernières activités -->
+            <div class="card shadow mt-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="card-title mb-0">
+                        <i class="ti ti-activity me-2 text-primary"></i>
+                        Activité Récente
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0">
+                            <div class="d-flex align-items-center">
+                                <i class="ti ti-file-text text-success me-3"></i>
+                                <div class="flex-grow-1">
+                                    <small class="fw-bold">Nouvelle déclaration</small>
+                                 </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <div class="d-flex align-items-center">
+                                <i class="ti ti-refresh text-warning me-3"></i>
+                                <div class="flex-grow-1">
+                                    <small class="fw-bold">Transformation terminée</small>
+                                 </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <div class="d-flex align-items-center">
+                                <i class="ti ti-settings text-info me-3"></i>
+                                <div class="flex-grow-1">
+                                    <small class="fw-bold">Processus assigné</small>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart.js pour la répartition par état
+    const etatCtx = document.getElementById('etatChart').getContext('2d');
+    const etatChart = new Chart(etatCtx, {
+        type: 'doughnut',
+        data: {{ chartData|json_encode|raw }},
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.raw + ' déchets';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Chargement des données mensuelles via AJAX
+    fetch('{{ path('app_dechet_workflow_stats') }}')
+        .then(response => response.json())
+        .then(data => {
+            // Graphique d'évolution mensuelle
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            const monthlyChart = new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: data.monthly.map(item => item.mois),
+                    datasets: [{
+                        label: 'Nombre de déchets',
+                        data: data.monthly.map(item => item.total),
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Nombre de déchets'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Jauge d'efficacité
+            const efficiencyCtx = document.getElementById('efficiencyGauge').getContext('2d');
+            const efficiencyValue = data.efficiency ? data.efficiency.taux_transformation : 0;
+            
+            document.getElementById('efficiencyValue').textContent = efficiencyValue + '%';
+            
+            new Chart(efficiencyCtx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [efficiencyValue, 100 - efficiencyValue],
+                        backgroundColor: ['#198754', '#e9ecef'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '75%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        }
+                    }
+                }
+            });
+        });
+
+    // Animation des cartes
+    const workflowCards = document.querySelectorAll('.workflow-step');
+    workflowCards.forEach((card, index) => {
+        card.style.animationDelay = (index * 0.1) + 's';
+        card.classList.add('animate__animated', 'animate__fadeInUp');
+    });
+});
+</script>
+
+<style>
+.workflow-step {
+    transition: all 0.3s ease;
+    border: 1px solid #e3f2fd;
+}
+.workflow-step:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    border-color: #2196f3;
+}
+.step-icon {
+    transition: transform 0.3s ease;
+}
+.workflow-step:hover .step-icon {
+    transform: scale(1.1);
+}
+.border-start {
+    border-left-width: 4px !important;
+}
+.card {
+    border: none;
+    border-radius: 12px;
+}
+</style>
+{% endblock %}

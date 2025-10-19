@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Workflow Gestion des Déchets{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">Workflow de Gestion des Déchets</h1>
+    
+    <div class="row">
+        {% for etape in etapes %}
+        <div class="col-md-3 mb-4">
+            <div class="card workflow-card">
+                <div class="card-body text-center">
+                    <div class="workflow-icon mb-3" style="font-size: 3rem;">{{ etape.icon }}</div>
+                    <h5 class="card-title">{{ etape.nom }}</h5>
+                    <a href="{{ path(etape.route) }}" class="btn btn-primary mt-3">
+                        Accéder
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ path('app_dechet_dashboard') }}" class="btn btn-info">
+            📊 Tableau de Bord Complet
+        </a>
+    </div>
+</div>
+
+<style>
+.workflow-card {
+    transition: transform 0.3s;
+    height: 100%;
+}
+.workflow-card:hover {
+    transform: translateY(-5px);
+}
+.workflow-icon {
+    opacity: 0.8;
+}
+</style>
+{% endblock %}

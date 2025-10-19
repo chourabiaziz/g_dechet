@@ -1,20 +1,114 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello DashboardController!{% endblock %}
+{% block title %}Tableau de Bord Déchets{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container mt-4">
+    <h1 class="mb-4">📊 Tableau de Bord - Gestion des Déchets</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h4>{{ stats.total }}</h4>
+                    <p>Total Déchets</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h4>{{ stats.declares }}</h4>
+                    <p>Déclarés</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h4>{{ stats.en_processus }}</h4>
+                    <p>En Processus</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h4>{{ stats.transformes }}</h4>
+                    <p>Transformés</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/Users/Administrator/Desktop/web_semantique/g_dechet/src/Controller/DashboardController.php'|file_link(0) }}">src/Controller/DashboardController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/Users/Administrator/Desktop/web_semantique/g_dechet/templates/dashboard/index.html.twig'|file_link(0) }}">templates/dashboard/index.html.twig</a></code></li>
-    </ul>
+    <!-- Liens rapides -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Accès Rapide par État</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{{ path('app_dechet_liste_etat', {'etat': 'declare'}) }}" class="btn btn-warning me-2">
+                        Déchets Déclarés ({{ stats.declares }})
+                    </a>
+                    <a href="{{ path('app_dechet_liste_etat', {'etat': 'en_processus'}) }}" class="btn btn-info me-2">
+                        En Processus ({{ stats.en_processus }})
+                    </a>
+                    <a href="{{ path('app_dechet_liste_etat', {'etat': 'transforme'}) }}" class="btn btn-success">
+                        Transformés ({{ stats.transformes }})
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Derniers déchets -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Derniers Déchets Traités</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Quantité</th>
+                            <th>État</th>
+                            <th>Date Production</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dechet in derniers_dechets %}
+                        <tr>
+                            <td>{{ dechet.id }}</td>
+                            <td>{{ dechet.type }}</td>
+                            <td>{{ dechet.quantite }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if dechet.etat == 'declare' %}bg-warning
+                                    {% elseif dechet.etat == 'en_processus' %}bg-info
+                                    {% elseif dechet.etat == 'transforme' %}bg-success
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ dechet.etat }}
+                                </span>
+                            </td>
+                            <td>{{ dechet.dateProduction|date('d/m/Y H:i') }}</td>
+                            <td>
+                                <a href="{{ path('app_dechet_tracabilite_view', {'id': dechet.id}) }}" class="btn btn-sm btn-outline-primary">
+                                    📊 Traçabilité
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

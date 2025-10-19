@@ -47,12 +47,22 @@
 
         {# Dashboard #}
         <li class="sidebar-item">
-            <a class="sidebar-link" href="{{ path('app_dashboard') }}" aria-expanded="false">
+            <a class="sidebar-link" href="{{ path('app_dechet_dashboard') }}" aria-expanded="false">
                 <i class="ti ti-layout-dashboard"></i>
                 <span class="hide-menu">Dashboard</span>
             </a>
         </li>
-
+              {# workflow #}
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_dechet_workflow') }}" aria-expanded="false">
+                <i class="ti ti-clipboard"></i>
+                <span class="hide-menu">workflow</span>
+            </a>
+        </li>
+ <li class="nav-small-cap">
+            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+            <span class="hide-menu">Configuration & ressource</span>
+        </li>
         {# Source #}
         <li class="sidebar-item">
             <a class="sidebar-link" href="{{ path('app_source_index') }}" aria-expanded="false">
@@ -61,14 +71,8 @@
             </a>
         </li>
 
-        {# Déchet #}
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="{{ path('app_dechet_index') }}" aria-expanded="false">
-                <i class="ti ti-trash"></i>
-                <span class="hide-menu">Déchet</span>
-            </a>
-        </li>
-
+      
+  
         {# Infrastructure #}
         <li class="sidebar-item">
             <a class="sidebar-link" href="{{ path('app_infrastructure_index') }}" aria-expanded="false">
@@ -85,21 +89,8 @@
             </a>
         </li>
 
-        {# Processus #}
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="{{ path('app_processus_index') }}" aria-expanded="false">
-                <i class="ti ti-settings"></i>
-                <span class="hide-menu">Processus</span>
-            </a>
-        </li>
-
-        {# Produit Recycle #}
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="{{ path('app_produit_recycl__index') }}" aria-expanded="false">
-                <i class="ti ti-package"></i>
-                <span class="hide-menu">Produit Recycle</span>
-            </a>
-        </li>
+ 
+ 
 
         {# Boucle Économie Circulaire #}
         <li class="sidebar-item">
@@ -108,14 +99,7 @@
                 <span class="hide-menu">Économie Circulaire</span>
             </a>
         </li>
-
-        {# Tracabilité #}
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="{{ path('app_tracabilite_index') }}" aria-expanded="false">
-                <i class="ti ti-calendar"></i>
-                <span class="hide-menu">Tracabilité</span>
-            </a>
-        </li>
+ 
     </ul>
 </nav>
 

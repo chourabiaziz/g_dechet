@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ titre_liste }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">{{ titre_liste }}</h1>
+
+    <!-- Filtres -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="btn-group">
+                <a href="{{ path('app_dechet_liste_etat', {'etat': 'declare'}) }}" 
+                   class="btn {% if etat_courant == 'declare' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                   Déclarés
+                </a>
+                <a href="{{ path('app_dechet_liste_etat', {'etat': 'en_processus'}) }}" 
+                   class="btn {% if etat_courant == 'en_processus' %}btn-info{% else %}btn-outline-info{% endif %}">
+                   En Processus
+                </a>
+                <a href="{{ path('app_dechet_liste_etat', {'etat': 'transforme'}) }}" 
+                   class="btn {% if etat_courant == 'transforme' %}btn-success{% else %}btn-outline-success{% endif %}">
+                   Transformés
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des déchets -->
+    <div class="card">
+        <div class="card-header">
+            <h5>{{ dechets|length }} déchet(s) trouvé(s)</h5>
+        </div>
+        <div class="card-body">
+            {% if dechets|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Quantité</th>
+                            <th>Source</th>
+                            <th>Acteur</th>
+                            <th>Date Production</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dechet in dechets %}
+                        <tr>
+                            <td>{{ dechet.id }}</td>
+                            <td>{{ dechet.type }}</td>
+                            <td>{{ dechet.quantite }} kg</td>
+                            <td>{{ dechet.source ? dechet.source.nom : 'N/A' }}</td>
+                            <td>{{ dechet.acteur ? dechet.acteur.nom : 'N/A' }}</td>
+                            <td>{{ dechet.dateProduction|date('d/m/Y H:i') }}</td>
+                            <td>
+                                <a href="{{ path('app_dechet_tracabilite_view', {'id': dechet.id}) }}" 
+                                   class="btn btn-sm btn-outline-primary" title="Voir la traçabilité">
+                                    📊
+                                </a>
+                                {% if etat_courant == 'declare' %}
+                                    <a href="{{ path('app_dechet_processus_assign', {'id': dechet.id}) }}" 
+                                       class="btn btn-sm btn-outline-info" title="Assigner un processus">
+                                        ⚙️
+                                    </a>
+                                {% endif %}
+                                {% if etat_courant == 'en_processus' %}
+                                    <a href="{{ path('app_dechet_transformation', {'id': dechet.id}) }}" 
+                                       class="btn btn-sm btn-outline-success" title="Transformer">
+                                        🔄
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <p class="text-muted">Aucun déchet trouvé dans cet état.</p>
+                <a href="{{ path('app_dechet_declaration') }}" class="btn btn-primary">
+                    📝 Déclarer un nouveau déchet
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{{ path('app_dechet_dashboard') }}" class="btn btn-secondary">
+            ← Retour au tableau de bord
+        </a>
+        <a href="{{ path('app_dechet_workflow') }}" class="btn btn-info">
+            🔄 Retour au workflow
+        </a>
+    </div>
+</div>
+{% endblock %}

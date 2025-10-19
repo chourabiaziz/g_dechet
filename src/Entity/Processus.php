@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProcessusRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProcessusRepository::class)]
@@ -27,6 +29,43 @@ class Processus
 
     #[ORM\ManyToOne(inversedBy: 'processuses')]
     private ?Autorite $autorite = null;
+
+    #[ORM\ManyToMany(targetEntity: Dechet::class, mappedBy: 'processus')]
+    private Collection $dechets;
+
+   
+
+    public function __construct()
+    {
+        $this->dechets = new ArrayCollection();
+    }
+
+ /**
+     * @return Collection<int, Dechet>
+     */
+    public function getDechets(): Collection
+    {
+        return $this->dechets;
+    }
+
+    public function addDechet(Dechet $dechet): static
+    {
+        if (!$this->dechets->contains($dechet)) {
+            $this->dechets->add($dechet);
+            $dechet->addProcessus($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDechet(Dechet $dechet): static
+    {
+        if ($this->dechets->removeElement($dechet)) {
+            $dechet->removeProcessus($this);
+        }
+
+        return $this;
+    }
 
     public function getId(): ?int
     {
