@@ -7,20 +7,18 @@ use App\Form\RegistrationFormType;
 use App\Repository\PlanRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use App\Security\AppCustomAuthenticator;
 
 class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request,
-    Security $security // <-- inject Security
-
-    , UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
+    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, UserAuthenticatorInterface $userAuthenticator, AppCustomAuthenticator $authenticator): Response
     {
 
 
@@ -42,12 +40,12 @@ class RegistrationController extends AbstractController
             );
             $user->setRegistrationDate(new \DateTime('+1 hour'));
             $user->setRoles(['ROLE_COACH']);
-             $entityManager->persist($user);
+            $entityManager->persist($user);
             $entityManager->flush();
 
             // do anything else you need here, like send an email
-// automatically log in the user
-$security->login($user);
+            // automatically log in the user
+            $userAuthenticator->authenticateUser($user, $authenticator, $request);
 
             return $this->redirectToRoute('app_dashboard');
         }

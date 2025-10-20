@@ -3,9 +3,12 @@
 {% block title %}Source index{% endblock %}
 
 {% block body %}
-    <h1>Source index</h1>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="mb-0">Source index</h1>
+        <input type="search" class="form-control form-control-sm js-table-search" style="max-width: 280px;" data-target="#sources-table" placeholder="Recherche dynamique...">
+    </div>
 
-    <table class="table">
+    <table id="sources-table" class="table table-striped" data-sortable="true">
         <thead>
             <tr>
                 <th>Id</th>
