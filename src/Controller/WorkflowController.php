@@ -9,6 +9,8 @@ use App\Entity\Tracabilite;
 use App\Form\DechetType;
 use App\Repository\DechetRepository;
 use App\Repository\ProcessusRepository;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -246,6 +248,36 @@ class WorkflowController extends AbstractController
             'dechet' => $dechet,
             'etape' => 'tracabilite'
         ]);
+    }
+
+    #[Route('/{id}/tracabilite/pdf', name: 'app_dechet_tracabilite_export_pdf', methods: ['GET'])]
+    public function tracabiliteExportPdf(Dechet $dechet): Response
+    {
+        if (!class_exists(\Dompdf\Dompdf::class)) {
+            $this->addFlash('danger', "La bibliothèque Dompdf n'est pas installée. Exécutez `composer require dompdf/dompdf`.");
+            return $this->redirectToRoute('app_dechet_tracabilite_view', ['id' => $dechet->getId()]);
+        }
+
+        $html = $this->renderView('dechet/tracabilite_pdf.html.twig', [
+            'dechet' => $dechet,
+        ]);
+
+        $options = new Options();
+        $options->set('defaultFont', 'DejaVu Sans');
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $output = $dompdf->output();
+
+        $response = new Response($output);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $filename = sprintf('dechet-%d-tracabilite-%s.pdf', $dechet->getId(), (new \DateTime())->format('Ymd-His'));
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+
+        return $response;
     }
 
     #[Route('/dashboard', name: 'app_dechet_dashboard', methods: ['GET'])]
