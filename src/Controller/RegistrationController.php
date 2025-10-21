@@ -49,7 +49,7 @@ class RegistrationController extends AbstractController
 // automatically log in the user
 $security->login($user);
 
-            return $this->redirectToRoute('app_dashboard');
+            return $this->redirectToRoute('app_dechet_workflow');
         }
 
         return $this->render('registration/register.html.twig', [
