@@ -12,7 +12,49 @@ class DechetRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Dechet::class);
     }
-
+    public function findByFilters(array $filters): array
+    {
+        $qb = $this->createQueryBuilder('d');
+    
+        if (!empty($filters['search'])) {
+            $qb->andWhere('d.type LIKE :search OR d.id = :id')
+               ->setParameter('search', '%' . $filters['search'] . '%')
+               ->setParameter('id', $filters['search']);
+        }
+    
+        if (!empty($filters['type'])) {
+            $qb->andWhere('d.type = :type')
+               ->setParameter('type', $filters['type']);
+        }
+    
+        if (!empty($filters['etat'])) {
+            $qb->andWhere('d.etat = :etat')
+               ->setParameter('etat', $filters['etat']);
+        }
+    
+        if (!empty($filters['date_from'])) {
+            $qb->andWhere('d.dateProduction >= :date_from')
+               ->setParameter('date_from', new \DateTime($filters['date_from']));
+        }
+    
+        if (!empty($filters['date_to'])) {
+            $qb->andWhere('d.dateProduction <= :date_to')
+               ->setParameter('date_to', new \DateTime($filters['date_to']));
+        }
+    
+        return $qb->orderBy('d.dateProduction', 'DESC')
+                  ->getQuery()
+                  ->getResult();
+    }
+    
+    public function getUniqueTypes(): array
+    {
+        return $this->createQueryBuilder('d')
+            ->select('DISTINCT d.type')
+            ->orderBy('d.type', 'ASC')
+            ->getQuery()
+            ->getSingleColumnResult();
+    }
     public function getWorkflowStats(): array
     {
         $conn = $this->getEntityManager()->getConnection();

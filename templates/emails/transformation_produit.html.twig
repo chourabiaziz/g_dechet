@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Transformation Produit</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .header { text-align: center; border-bottom: 2px solid #28a745; padding-bottom: 15px; margin-bottom: 20px; }
+        .logo { max-width: 150px; height: auto; }
+        .content { line-height: 1.6; }
+        .details { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .footer { text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="http://localhost:8000/small-logo.png" alt="Longevity Plus" class="logo">
+            <h1 style="color: #28a745;">Transformation Réussie</h1>
+        </div>
+        
+        <div class="content">
+            <p>Un déchet a été transformé avec succès en produit recyclé.</p>
+            
+            <div class="details">
+                <h3>Détails de la transformation :</h3>
+                <p><strong>Déchet ID :</strong> #{{ dechet.id }}</p>
+                <p><strong>Type de déchet :</strong> {{ dechet.type }}</p>
+                <p><strong>Quantité traitée :</strong> {{ dechet.quantite }}</p>
+                <p><strong>Produit créé :</strong> {{ produitRecycle.nom }}</p>
+                <p><strong>Type de produit :</strong> {{ produitRecycle.type }}</p>
+                <p><strong>Date de transformation :</strong> {{ date|date('d/m/Y H:i') }}</p>
+            </div>
+            
+            <p>Cette transformation contribue à l'économie circulaire et réduit l'impact environnemental.</p>
+        </div>
+        
+ 
+    </div>
+</body>
+</html>

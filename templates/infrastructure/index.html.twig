@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for infrastructure in infrastructures %}
+        {% for infrastructure in infrastructures|reverse %}
             <tr>
                 <td>{{ infrastructure.id }}</td>
                 <td>{{ infrastructure.nom }}</td>

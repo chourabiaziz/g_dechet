@@ -63,6 +63,16 @@
             <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
             <span class="hide-menu">Configuration & ressource</span>
         </li>
+
+
+          <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_dechet_index') }}" aria-expanded="false">
+                <i class="ti ti-trash"></i>
+                <span class="hide-menu">Dechet</span>
+            </a>
+        </li>
+
+
         {# Source #}
         <li class="sidebar-item">
             <a class="sidebar-link" href="{{ path('app_source_index') }}" aria-expanded="false">
@@ -80,6 +90,16 @@
                 <span class="hide-menu">Infrastructure</span>
             </a>
         </li>
+
+
+             {# Acteur #}
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="{{ path('app_processus_index') }}" aria-expanded="false">
+                <i class="ti ti-settings"></i>
+                <span class="hide-menu">Processus</span>
+            </a>
+        </li>
+
 
         {# Acteur #}
         <li class="sidebar-item">

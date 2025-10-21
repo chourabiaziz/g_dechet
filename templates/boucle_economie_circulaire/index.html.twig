@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for boucle_economie_circulaire in boucle_economie_circulaires %}
+        {% for boucle_economie_circulaire in boucle_economie_circulaires|reverse %}
             <tr>
                 <td>{{ boucle_economie_circulaire.id }}</td>
                 <td>{{ boucle_economie_circulaire.nom }}</td>
