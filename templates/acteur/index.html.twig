@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for acteur in acteurs %}
+        {% for acteur in acteurs|reverse %}
             <tr>
                 <td>{{ acteur.id }}</td>
                 <td>{{ acteur.nom }}</td>

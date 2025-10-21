@@ -419,6 +419,257 @@
 	.prev, .next {
 		font-weight: bold;
 	}
+    /* Styles personnalisés pour les formulaires */
+.custom-form {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.custom-form-group {
+    position: relative;
+}
+
+.custom-form-label {
+    color: #2d3748;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.custom-form-label::before {
+    content: "•";
+    color: #3b82f6;
+    font-weight: bold;
+}
+
+/* TOUS LES INPUTS AVEC FOND BLANC */
+.custom-input,
+.custom-textarea,
+.custom-select,
+.custom-file-input,
+.custom-money-input,
+.custom-percent-input {
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #ffffff !important; /* FORCE LE BLANC */
+    color: #2d3748;
+}
+
+.custom-input:focus,
+.custom-textarea:focus,
+.custom-select:focus,
+.custom-file-input:focus,
+.custom-money-input:focus,
+.custom-percent-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+    background: #ffffff !important;
+    outline: none;
+}
+
+.custom-input:hover,
+.custom-textarea:hover,
+.custom-select:hover,
+.custom-file-input:hover,
+.custom-money-input:hover,
+.custom-percent-input:hover {
+    border-color: #cbd5e0;
+    background: #ffffff !important;
+}
+
+.custom-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Checkbox et Radio */
+.custom-checkbox,
+.custom-radio {
+    transform: scale(1.2);
+    margin-right: 0.5rem;
+}
+
+.custom-checkbox:checked {
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+.custom-radio:checked {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+/* Bouton submit */
+.custom-submit-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border: none;
+    border-radius: 0.75rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    color: white;
+}
+
+.custom-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    color: white;
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+
+.custom-submit-btn:active {
+    transform: translateY(0);
+}
+
+.custom-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.custom-submit-btn:hover::before {
+    left: 100%;
+}
+
+/* Alertes */
+.alert-custom {
+    background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+    border: none;
+    border-radius: 0.75rem;
+    border-left: 4px solid #e53e3e;
+    color: #742a2a;
+}
+
+/* Text d'aide */
+.custom-help-text {
+    color: #718096;
+    font-size: 0.875rem;
+    font-style: italic;
+}
+
+/* File input personnalisé - FOND BLANC */
+.custom-file-input::file-selector-button {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    margin-right: 1rem;
+    transition: all 0.3s ease;
+}
+
+.custom-file-input::file-selector-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Input group - FOND BLANC */
+.input-group-text {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0;
+    border-right: none;
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.input-group .form-control {
+    border-left: none;
+}
+
+.input-group .form-control:focus {
+    border-left: 2px solid #3b82f6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .custom-form {
+        padding: 1rem;
+        margin: 0 -1rem;
+        border-radius: 0;
+    }
+    
+    .custom-submit-btn {
+        padding: 1rem !important;
+    }
+}
+
+/* Champs requis */
+.custom-form-label.required::after {
+    content: " *";
+    color: #e53e3e;
+    font-weight: bold;
+}
+
+/* États de validation */
+.custom-input.is-valid,
+.custom-textarea.is-valid,
+.custom-select.is-valid {
+    border-color: #10b981;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2310b981' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    background-color: #ffffff !important;
+}
+
+.custom-input.is-invalid,
+.custom-textarea.is-invalid,
+.custom-select.is-invalid {
+    border-color: #e53e3e;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23e53e3e'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23e53e3e' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    background-color: #ffffff !important;
+}
+
+/* Pour les selects multiples */
+.custom-select[multiple] {
+    background: #ffffff !important;
+}
+
+/* Pour les champs désactivés */
+.custom-input:disabled,
+.custom-textarea:disabled,
+.custom-select:disabled {
+    background-color: #f7fafc !important;
+    opacity: 0.6;
+}
+
+/* Assurer que tous les types d'input ont un fond blanc */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input[type="time"],
+textarea,
+select {
+    background-color: #ffffff !important;
+}
 	</style>
 	
 </head>

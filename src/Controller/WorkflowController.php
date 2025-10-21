@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controller;
-    
+
 use App\Entity\Dechet;
 use App\Entity\Processus;
 use App\Entity\ProduitRecycle;
@@ -9,20 +9,20 @@ use App\Entity\Tracabilite;
 use App\Form\DechetType;
 use App\Repository\DechetRepository;
 use App\Repository\ProcessusRepository;
+use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+
 #[Route('/work')]
 class WorkflowController extends AbstractController
 {
-
-
-  
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private MailService $mailService
     ) {}
 
     #[Route('/workflow', name: 'app_dechet_workflow', methods: ['GET'])]
@@ -96,8 +96,18 @@ class WorkflowController extends AbstractController
             $this->entityManager->persist($tracabilite);
             $this->entityManager->flush();
 
+            // Envoi d'email pour l'étape de déclaration
+            $this->mailService->sendMail(
+                'chourabiaziz007@gmail.com',
+                'Nouveau déchet déclaré - Longevity Plus',
+                $this->renderView('emails/declaration_dechet.html.twig', [
+                    'dechet' => $dechet,
+                    'date' => new \DateTime()
+                ])
+            );
+
             $this->addFlash('success', 'Déchet déclaré avec succès. ID: ' . $dechet->getId());
-            return $this->redirectToRoute('app_dechet_processus_list');
+            return $this->redirectToRoute('app_dechet_index');
         }
 
         return $this->render('dechet/declaration.html.twig', [
@@ -118,7 +128,7 @@ class WorkflowController extends AbstractController
         ]);
     }
 
-    // ÉTAPE 2b: ASSIGNATION AU PROCESSUS (déjà existante)
+    // ÉTAPE 2b: ASSIGNATION AU PROCESSUS
     #[Route('/{id}/processus/assign', name: 'app_dechet_processus_assign', methods: ['GET', 'POST'])]
     public function assignProcessus(Request $request, Dechet $dechet, ProcessusRepository $processusRepository): Response
     {
@@ -142,6 +152,17 @@ class WorkflowController extends AbstractController
                 }
 
                 $this->entityManager->flush();
+
+                // Envoi d'email pour l'étape d'assignation au processus
+                $this->mailService->sendMail(
+                    'chourabiaziz007@gmail.com',
+                    'Déchet assigné au processus - Longevity Plus',
+                    $this->renderView('emails/assignation_processus.html.twig', [
+                        'dechet' => $dechet,
+                        'processus' => $processus,
+                        'date' => new \DateTime()
+                    ])
+                );
 
                 $this->addFlash('success', 'Déchet assigné au processus: ' . $processus->getNom());
                 return $this->redirectToRoute('app_dechet_processus_list');
@@ -167,11 +188,10 @@ class WorkflowController extends AbstractController
         ]);
     }
 
-    // ÉTAPE 3b: TRANSFORMATION EN PRODUIT RECYCLÉ (déjà existante)
+    // ÉTAPE 3b: TRANSFORMATION EN PRODUIT RECYCLÉ
     #[Route('/{id}/transformation', name: 'app_dechet_transformation', methods: ['GET', 'POST'])]
     public function transformation(Request $request, Dechet $dechet): Response
     {
-        // Le contrôleur passe 'dechet' (singulier) et non 'dechets' (pluriel)
         if ($dechet->getProcessuses()->isEmpty()) {
             $this->addFlash('warning', 'Veuillez d\'abord assigner un processus à ce déchet.');
             return $this->redirectToRoute('app_dechet_processus_assign', ['id' => $dechet->getId()]);
@@ -200,13 +220,24 @@ class WorkflowController extends AbstractController
     
             $this->entityManager->persist($produitRecycle);
             $this->entityManager->flush();
+
+            // Envoi d'email pour l'étape de transformation
+            $this->mailService->sendMail(
+                'chourabiaziz007@gmail.com',
+                'Déchet transformé en produit recyclé - Longevity Plus',
+                $this->renderView('emails/transformation_produit.html.twig', [
+                    'dechet' => $dechet,
+                    'produitRecycle' => $produitRecycle,
+                    'date' => new \DateTime()
+                ])
+            );
     
             $this->addFlash('success', 'Déchet transformé en produit recyclé: ' . $nomProduit);
             return $this->redirectToRoute('app_dechet_tracabilite_view', ['id' => $dechet->getId()]);
         }
     
         return $this->render('dechet/transformation.html.twig', [
-            'dechet' => $dechet, // ✅ Variable correcte
+            'dechet' => $dechet,
             'etape' => 'transformation'
         ]);
     }
@@ -231,6 +262,17 @@ class WorkflowController extends AbstractController
                 ->getSingleScalarResult(),
         ];
 
+        // Envoi d'email pour consultation du dashboard de traçabilité
+        $this->mailService->sendMail(
+            'chourabiaziz007@gmail.com',
+            'Consultation du dashboard de traçabilité - Longevity Plus',
+            $this->renderView('emails/consultation_tracabilite.html.twig', [
+                'stats' => $statsTransformation,
+                'date' => new \DateTime(),
+                'utilisateur' => $this->getUser() ? $this->getUser()->getUserIdentifier() : 'Utilisateur anonyme'
+            ])
+        );
+
         return $this->render('dechet/tracabilite_dashboard.html.twig', [
             'derniers_dechets' => $derniersDechets,
             'stats' => $statsTransformation,
@@ -238,10 +280,12 @@ class WorkflowController extends AbstractController
         ]);
     }
 
-    // ÉTAPE 4b: VISUALISATION DE LA TRAÇABILITÉ (déjà existante)
+    // ÉTAPE 4b: VISUALISATION DE LA TRAÇABILITÉ
     #[Route('/{id}/tracabilite', name: 'app_dechet_tracabilite_view', methods: ['GET'])]
     public function tracabiliteView(Dechet $dechet): Response
     {
+        
+
         return $this->render('dechet/tracabilite.html.twig', [
             'dechet' => $dechet,
             'etape' => 'tracabilite'
@@ -298,11 +342,11 @@ class WorkflowController extends AbstractController
         
         return $this->json([
             'monthly' => $monthlyStats,
-             'types' => $dechetRepository->getStatsByType()
+            'types' => $dechetRepository->getStatsByType()
         ]);
     }
 
-    // LISTE DES DÉCHETS PAR ÉTAPE (déjà existante)
+    // LISTE DES DÉCHETS PAR ÉTAPE
     #[Route('/liste/{etat}', name: 'app_dechet_liste_etat', methods: ['GET'])]
     public function listeParEtat(string $etat, DechetRepository $dechetRepository): Response
     {
@@ -320,4 +364,16 @@ class WorkflowController extends AbstractController
             'titre_liste' => $etapesLabels[$etat] ?? 'Déchets'
         ]);
     }
+
+    #[Route('/test-mail', name: 'test_mail')]
+    public function testMail(): Response
+    {
+        $this->mailService->sendMail(
+            'chourabiaziz007@gmail.com',
+            'Test d\'envoi depuis Longevity Plus',
+            '<h1>Ceci est un test</h1><p>Envoi réussi 🚀</p>'
+        );
+
+        return new Response('Email envoyé avec succès !');
     }
+}

@@ -1,41 +1,484 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Dechet index{% endblock %}
+{% block title %}Gestion des Déchets - Tableau de Bord{% endblock %}
 
 {% block body %}
-    <h1>Dechet index</h1>
+<div class="container-fluid py-4">
+    <!-- Header avec statistiques -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-primary shadow-primary border-0">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="text-black mb-2">Gestion des Déchets</h1>
+                            <p class="text-black opacity-8 mb-0">Suivi et traçabilité complète des déchets</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="{{ path('app_dechet_declaration') }}" class="btn btn-success btn-lg">
+                                <i class="ti ti-plus me-2"></i>Nouvelle Déclaration
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Type</th>
-                <th>Quantite</th>
-                <th>DateProduction</th>
-                <th>Etat</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for dechet in dechets %}
-            <tr>
-                <td>{{ dechet.id }}</td>
-                <td>{{ dechet.type }}</td>
-                <td>{{ dechet.quantite }}</td>
-                <td>{{ dechet.dateProduction ? dechet.dateProduction|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ dechet.etat }}</td>
+    <!-- Filtres et Recherche -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Barre de recherche -->
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="ti ti-search text-muted"></i>
+                                </span>
+                                <input type="text" id="search-input" class="form-control border-start-0" 
+                                       placeholder="Rechercher par type ou ID...">
+                            </div>
+                        </div>
+                        
+                        <!-- Filtre Type -->
+                        <div class="col-md-2">
+                            <select id="type-filter" class="form-select">
+                                <option value="">Tous les types</option>
+                                {% for type in ['plastique', 'verre', 'métal', 'papier', 'organique', 'électronique'] %}
+                                    <option value="{{ type }}">{{ type|title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Filtre État -->
+                        <div class="col-md-2">
+                            <select id="etat-filter" class="form-select">
+                                <option value="">Tous les états</option>
+                                <option value="declare">Déclaré</option>
+                                <option value="en_processus">En Processus</option>
+                                <option value="transforme">Transformé</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Filtre Date -->
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <input type="date" id="date-from" class="form-control" placeholder="Du">
+                                <span class="input-group-text">à</span>
+                                <input type="date" id="date-to" class="form-control" placeholder="Au">
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons Actions -->
+                        <div class="col-md-1">
+                            <button id="reset-filters" class="btn btn-outline-secondary w-100" title="Réinitialiser">
+                                <i class="ti ti-refresh"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cartes de statistiques -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-stats">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <h5 class="card-title text-uppercase text-muted mb-0">Total Déchets</h5>
+                            <span class="h2 font-weight-bold mb-0" id="total-count">0</span>
+                        </div>
+        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-stats">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <h5 class="card-title text-uppercase text-muted mb-0">Déclarés</h5>
+                            <span class="h2 font-weight-bold mb-0" id="declare-count">0</span>
+                        </div>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-stats">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <h5 class="card-title text-uppercase text-muted mb-0">En Processus</h5>
+                            <span class="h2 font-weight-bold mb-0" id="processus-count">0</span>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-stats">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <h5 class="card-title text-uppercase text-muted mb-0">Transformés</h5>
+                            <span class="h2 font-weight-bold mb-0" id="transforme-count">0</span>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau des déchets -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"> Liste des Déchets</h5>
+                    <div class="loading-spinner d-none">
+                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                        <span>Chargement...</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="dechets-table">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th width="80" class="text-center">QR Code</th>
+                                    <th width="100">ID</th>
+                                    <th>Type</th>
+                                    <th width="120">Quantité</th>
+                                    <th width="150">Date Production</th>
+                                    <th width="140">État</th>
+                                    <th width="200" class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dechets-tbody">
+                                <!-- Les données seront chargées via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="no-results" class="text-center py-5 d-none">
+                        <i class="ti ti-search-off display-4 text-muted mb-3"></i>
+                        <h5 class="text-muted">Aucun déchet trouvé</h5>
+                        <p class="text-muted">Essayez de modifier vos critères de recherche</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal QR Code -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📱 QR Code Traçabilité</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="qr-modal-image" src="" alt="QR Code" class="img-fluid">
+                <p class="text-muted mt-3 small">Scanner pour voir la traçabilité complète</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card-stats .icon-shape {
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-spinner {
+    display: inline-flex;
+    align-items: center;
+}
+
+.qr-code {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    padding: 2px;
+}
+
+.qr-code:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5em 0.75em;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0,0,0,0.02);
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+</style>
+
+<script>
+class DechetManager {
+    constructor() {
+        this.filters = {
+            search: '',
+            type: '',
+            etat: '',
+            date_from: '',
+            date_to: ''
+        };
+        this.init();
+    }
+
+    init() {
+        this.bindEvents();
+        this.loadDechets();
+    }
+
+    bindEvents() {
+        // Recherche en temps réel avec debounce
+        $('#search-input').on('input', this.debounce(() => {
+            this.filters.search = $('#search-input').val();
+            this.loadDechets();
+        }, 300));
+
+        // Filtres
+        $('#type-filter, #etat-filter').on('change', () => {
+            this.filters.type = $('#type-filter').val();
+            this.filters.etat = $('#etat-filter').val();
+            this.loadDechets();
+        });
+
+        // Filtres date
+        $('#date-from, #date-to').on('change', () => {
+            this.filters.date_from = $('#date-from').val();
+            this.filters.date_to = $('#date-to').val();
+            this.loadDechets();
+        });
+
+        // Reset filters
+        $('#reset-filters').on('click', () => {
+            this.resetFilters();
+        });
+    }
+
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    resetFilters() {
+        $('#search-input').val('');
+        $('#type-filter').val('');
+        $('#etat-filter').val('');
+        $('#date-from').val('');
+        $('#date-to').val('');
+        
+        this.filters = {
+            search: '',
+            type: '',
+            etat: '',
+            date_from: '',
+            date_to: ''
+        };
+        
+        this.loadDechets();
+    }
+
+    async loadDechets() {
+    this.showLoading();
+    
+    try {
+        const params = new URLSearchParams(this.filters);
+        const response = await fetch(`/api/dechets?${params}`);
+        const data = await response.json();
+        
+        this.renderDechets(data.dechets);
+        this.updateStats(data.dechets);
+    } catch (error) {
+        console.error('Erreur lors du chargement:', error);
+        this.showError();
+    } finally {
+        // ✅ Toujours cacher le spinner à la fin
+        this.hideLoading();
+    }
+}
+
+
+    renderDechets(dechets) {
+        const tbody = $('#dechets-tbody');
+        const noResults = $('#no-results');
+        
+        if (dechets.length === 0) {
+            tbody.empty();
+            noResults.removeClass('d-none');
+            return;
+        }
+        
+        noResults.addClass('d-none');
+        
+        const rows = dechets.map(dechet => this.createDechetRow(dechet));
+        tbody.html(rows.join(''));
+        
+        this.bindRowEvents();
+    }
+
+    createDechetRow(dechet) {
+        const etatClass = this.getEtatClass(dechet.etat);
+        const etatIcon = this.getEtatIcon(dechet.etat);
+        
+        return `
+            <tr class="align-middle">
+                <td class="text-center">
+                    <div class="qr-tooltip">
+                        <img src="${dechet.qr_code}" 
+                             width="60" 
+                             height="60" 
+                             alt="QR Code"
+                             class="qr-code"
+                             data-bs-toggle="modal" 
+                             data-bs-target="#qrModal"
+                             data-qr-src="${dechet.qr_code}">
+                        <span class="tooltip-text">Scanner pour la traçabilité</span>
+                    </div>
+                </td>
+                <td class="fw-bold text-primary">#${dechet.id}</td>
                 <td>
-                    <a href="{{ path('app_dechet_show', {'id': dechet.id}) }}"class="btn btn-info"><i class="ti ti-eye"></i></a>
-                    <a href="{{ path('app_dechet_edit', {'id': dechet.id}) }}"class="btn btn-secondary"><i class="ti ti-settings"></i></a>
+                    <span class="badge bg-light text-dark">${dechet.type}</span>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="ti ti-scale text-muted me-2"></i>
+                        ${dechet.quantite} kg
+                    </div>
+                </td>
+                <td>
+                    <small class="text-muted">${dechet.dateProduction}</small>
+                </td>
+                <td>
+                    <span class="badge ${etatClass}">
+                        <i class="ti ${etatIcon} me-1"></i>
+                        ${dechet.etat}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <div class="btn-group btn-group-sm">
+                        <a href="${dechet.actions.tracabilite}" 
+                           class="btn btn-outline-primary" 
+                           title="Voir la traçabilité">
+                           <i class="ti ti-chart-bar"></i>
+                        </a>
+                        ${dechet.actions.processus ? `
+                            <a href="${dechet.actions.processus}" 
+                               class="btn btn-outline-info" 
+                               title="Assigner un processus">
+                                <i class="ti ti-settings"></i>
+                            </a>
+                        ` : ''}
+                        ${dechet.actions.transformation ? `
+                            <a href="${dechet.actions.transformation}" 
+                               class="btn btn-outline-success" 
+                               title="Transformer">
+                                <i class="ti ti-refresh"></i>
+                            </a>
+                        ` : ''}
+                    </div>
                 </td>
             </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        `;
+    }
 
-    <a href="{{ path('app_dechet_new') }}"class="btn btn-success">Create new</a>
+    getEtatClass(etat) {
+        const classes = {
+            'declare': 'bg-warning',
+            'en_processus': 'bg-info',
+            'transforme': 'bg-success'
+        };
+        return classes[etat] || 'bg-secondary';
+    }
+
+    getEtatIcon(etat) {
+        const icons = {
+            'declare': 'ti-file-alert',
+            'en_processus': 'ti-settings',
+            'transforme': 'ti-check'
+        };
+        return icons[etat] || 'ti-circle-dot';
+    }
+
+    bindRowEvents() {
+        // Modal QR Code
+        $('.qr-code').on('click', function() {
+            const qrSrc = $(this).data('qr-src');
+            $('#qr-modal-image').attr('src', qrSrc);
+        });
+    }
+
+    updateStats(dechets) {
+        $('#total-count').text(dechets.length);
+        $('#declare-count').text(dechets.filter(d => d.etat === 'declare').length);
+        $('#processus-count').text(dechets.filter(d => d.etat === 'en_processus').length);
+        $('#transforme-count').text(dechets.filter(d => d.etat === 'transforme').length);
+    }
+
+    showLoading() {
+        $('.loading-spinner').removeClass('d-none');
+        $('#dechets-tbody').html(`
+            <tr>
+                <td colspan="7" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </td>
+            </tr>
+        `);
+    }
+    hideLoading() {
+    $('.loading-spinner').addClass('d-none');
+}
+
+    showError() {
+        $('#dechets-tbody').html(`
+            <tr>
+                <td colspan="7" class="text-center py-4 text-danger">
+                    <i class="ti ti-alert-triangle me-2"></i>
+                    Erreur lors du chargement des données
+                </td>
+            </tr>
+        `);
+    }
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    new DechetManager();
+});
+</script>
 {% endblock %}

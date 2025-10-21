@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Nouveau Déchet</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .header { text-align: center; border-bottom: 2px solid #ffc107; padding-bottom: 15px; margin-bottom: 20px; }
+        .logo { max-width: 150px; height: auto; }
+        .content { line-height: 1.6; }
+        .details { background: #fff3cd; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .footer { text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="http://localhost:8000/small-logo.png" alt="Longevity Plus" class="logo">
+            <h1 style="color: #ffc107;">Nouveau Déchet Déclaré</h1>
+        </div>
+        
+        <div class="content">
+            <p>Un nouveau déchet a été déclaré dans le système Longevity Plus.</p>
+            
+            <div class="details">
+                <h3>Détails du déchet :</h3>
+                <ul>
+                    <li><strong>ID :</strong> {{ dechet.id }}</li>
+                    <li><strong>Type :</strong> {{ dechet.type }}</li>
+                    <li><strong>Quantité :</strong> {{ dechet.quantite }}</li>
+                    <li><strong>Date de production :</strong> {{ dechet.dateProduction|date('d/m/Y H:i') }}</li>
+                </ul>
+            </div>
+
+            <p><strong>Date de déclaration :</strong> {{ date|date('d/m/Y H:i') }}</p>
+        </div>
+        
+     
+    </div>
+</body>
+</html>

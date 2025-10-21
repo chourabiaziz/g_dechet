@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for processu in processuses %}
+        {% for processu in processuses|reverse %}
             <tr>
                 <td>{{ processu.id }}</td>
                 <td>{{ processu.nom }}</td>

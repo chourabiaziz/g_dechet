@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Assignation Processus</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .header { text-align: center; border-bottom: 2px solid #0dcaf0; padding-bottom: 15px; margin-bottom: 20px; }
+        .logo { max-width: 150px; height: auto; }
+        .content { line-height: 1.6; }
+        .details { background: #d1ecf1; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .footer { text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="http://localhost:8000/small-logo.png" alt="Longevity Plus" class="logo">
+            <h1 style="color: #0dcaf0;">Déchet Assigné au Processus</h1>
+        </div>
+        
+        <div class="content">
+            <p>Le déchet #{{ dechet.id }} a été assigné à un processus de traitement.</p>
+            
+            <div class="details">
+                <h3>Détails de l'assignation :</h3>
+                <p><strong>Déchet ID :</strong> {{ dechet.id }}</p>
+                <p><strong>Type de déchet :</strong> {{ dechet.type }}</p>
+                <p><strong>Processus :</strong> {{ processus.nom }}</p>
+                <p><strong>Date d'assignation :</strong> {{ date|date('d/m/Y H:i') }}</p>
+            </div>
+            
+            <p>Le déchet est maintenant en cours de traitement dans le processus "{{ processus.nom }}".</p>
+        </div>
+        
+ 
+    </div>
+</body>
+</html>
