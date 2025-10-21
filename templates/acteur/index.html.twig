@@ -1,37 +1,268 @@
+{# templates/acteur/index.html.twig #}
 {% extends 'base.html.twig' %}
-
-{% block title %}Acteur index{% endblock %}
+{% block title %}Acteurs{% endblock %}
 
 {% block body %}
-    <h1>Acteur index</h1>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Role</th>
-                <th>actions</th>
-            </tr>
+<style>
+  .card { border-radius: 14px; }
+  .table > :not(caption) > * > * { vertical-align: middle; }
+  .badge-role { background: #f6f8fa; color: #333; border: 1px solid #e6e8eb; }
+  .search-input::placeholder { color: #aaa; }
+</style>
+
+<div class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 m-0">
+      <i class="ti ti-users-group me-2"></i>Acteurs
+    </h1>
+    <div class="btn-group">
+      <button id="btnCsv" class="btn btn-outline-secondary">
+        <i class="ti ti-file-type-csv me-1"></i> Télécharger CSV
+      </button>
+      <a href="{{ path('app_acteur_new') }}" class="btn btn-success">
+        <i class="ti ti-square-plus me-1"></i> Nouveau
+      </a>
+    </div>
+  </div>
+
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label"><i class="ti ti-search me-1"></i>Recherche</label>
+          <input id="q" class="form-control search-input" placeholder="Nom ou rôle…">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label"><i class="ti ti-arrows-sort me-1"></i>Tri</label>
+          <select id="sort" class="form-select">
+            <option value="id">ID</option>
+            <option value="nom">Nom</option>
+            <option value="role">Rôle</option>
+            <option value="nbDechets">Nombre de Déchets</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label invisible">.</label>
+          <button id="dir" class="btn w-100 btn-outline-dark">
+            <i class="ti ti-sort-ascending-letters me-1"></i><span>ASC</span>
+          </button>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label"><i class="ti ti-list-numbers me-1"></i>Par page</label>
+          <select id="limit" class="form-select">
+            <option>10</option><option>20</option><option>50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Charts #}
+  <div class="row g-3 mb-4">
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <i class="ti ti-chart-donut-2 me-2"></i>Répartition par rôle
+        </div>
+        <div class="card-body"><canvas id="roleChart" width="100%"></canvas></div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <i class="ti ti-sparkles me-2"></i>Top 5 (noms) – Sparkline
+        </div>
+        <div class="card-body"><canvas id="sparkChart" height="140"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead class="table-light">
+        <tr>
+          <th style="width:80px;">ID</th>
+          <th>Nom</th>
+          <th>Rôle</th>
+          <th>Nombre de Déchets</th>
+          <th class="text-end" style="width:140px;"><i class="ti ti-settings"></i></th>
+        </tr>
         </thead>
-        <tbody>
-        {% for acteur in acteurs %}
-            <tr>
-                <td>{{ acteur.id }}</td>
-                <td>{{ acteur.nom }}</td>
-                <td>{{ acteur.role }}</td>
-                <td>
-                    <a href="{{ path('app_acteur_show', {'id': acteur.id}) }}"class="btn btn-info"><i class="ti ti-eye"></i></a>
-                    <a href="{{ path('app_acteur_edit', {'id': acteur.id}) }}"class="btn btn-secondary"><i class="ti ti-settings"></i></a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
 
-    <a href="{{ path('app_acteur_new') }}"class="btn btn-success">Create new</a>
+    <div class="card-footer d-flex align-items-center justify-content-between">
+      <div id="meta" class="small text-muted"></div>
+      <nav aria-label="Pagination">
+        <ul id="pager" class="pagination mb-0"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<script>
+/* --- State --- */
+const state = { q:'', sort:'id', dir:'ASC', page:1, limit:10 };
+
+/* --- Elements --- */
+const tbody = document.getElementById('tbody');
+const meta  = document.getElementById('meta');
+const pager = document.getElementById('pager');
+const q     = document.getElementById('q');
+const sort  = document.getElementById('sort');
+const dirBtn= document.getElementById('dir');
+const limit = document.getElementById('limit');
+const btnCsv= document.getElementById('btnCsv');
+
+/* --- Endpoint (robuste aux sous-dossiers) --- */
+const baseData = "{{ path('app_acteur_data') }}";
+const urlData  = new URL(baseData, window.location.href);
+
+/* --- Charts --- */
+let roleChart, sparkChart;
+
+/* --- CSV helper: UTF-8 BOM + "sep=;" pour Excel FR --- */
+function downloadCsvWithStats(items, stats) {
+  const sep = ';';
+  const escapeCell = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const row = arr => arr.map(escapeCell).join(sep);
+
+  const lines = [];
+  lines.push('sep=;'); // indique à Excel d'utiliser ';'
+
+  // En-têtes + lignes
+  lines.push(row(['ID','Nom','Rôle','Nombre de Déchets']));
+  for (const r of items) {
+    lines.push(row([r.id, r.nom, r.role, r.nbDechets ?? 0]));
+  }
+
+  // Section facultative pour infos chart
+  lines.push('');
+  lines.push('# Charts Info');
+  lines.push(row(['Rôle','Nombre']));
+  for (const rr of (stats?.roles ?? [])) {
+    lines.push(row([rr.role || 'N/A', rr.total]));
+  }
+
+  const blob = new Blob(['\ufeff', lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `acteurs_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+/* --- Renderers --- */
+function renderRows(items){
+  tbody.innerHTML = items.map(r=>`
+    <tr>
+      <td>${r.id}</td>
+      <td>${r.nom}</td>
+      <td><span class="badge badge-role"><i class="ti ti-id-badge-2 me-1"></i>${r.role}</span></td>
+      <td>${r.nbDechets}</td>
+      <td class="text-end">
+        <a href="/acteur/${r.id}" class="btn btn-sm btn-outline-info me-1" title="Voir"><i class="ti ti-eye"></i></a>
+        <a href="/acteur/${r.id}/edit" class="btn btn-sm btn-outline-secondary" title="Modifier"><i class="ti ti-settings"></i></a>
+      </td>
+    </tr>`).join('');
+}
+
+function renderPager(total){
+  const pages = Math.max(1, Math.ceil(total / state.limit));
+  pager.innerHTML = '';
+
+  const mk = (p, label, disabled=false, active=false)=>`
+    <li class="page-item ${disabled?'disabled':''} ${active?'active':''}">
+      <a class="page-link" href="#" data-p="${p}">${label}</a>
+    </li>`;
+
+  pager.innerHTML += mk(state.page-1, '<i class="ti ti-chevron-left"></i>', state.page<=1);
+  let start = Math.max(1, state.page-2);
+  let end   = Math.min(pages, state.page+2);
+  for(let p=start; p<=end; p++) pager.innerHTML += mk(p, p, false, p===state.page);
+  pager.innerHTML += mk(state.page+1, '<i class="ti ti-chevron-right"></i>', state.page>=pages);
+
+  pager.querySelectorAll('a.page-link').forEach(a=>{
+    a.addEventListener('click', e=>{
+      e.preventDefault();
+      const p = parseInt(a.dataset.p,10);
+      if (!isNaN(p) && p>=1 && p<=pages && p!==state.page){ state.page=p; load(); }
+    });
+  });
+
+  meta.textContent = `Total: ${total} — Page ${state.page}/${pages} — Tri: ${state.sort} ${state.dir}`;
+}
+
+function upCharts(stats){
+  // Donut répartition par rôle
+  const labels = (stats.roles ?? []).map(r=>r.role || 'N/A');
+  const data   = (stats.roles ?? []).map(r=>r.total);
+  if (roleChart) roleChart.destroy();
+  roleChart = new Chart(document.getElementById('roleChart'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data }] },
+    options: { plugins: { legend: { position: 'right' } } }
+  });
+
+  // Top 5 par nb de déchets (barres pour que ça se voie, sinon line possible)
+  const t = stats.topByDechets ?? [];
+  const lab2 = t.map(x=>x.nom);
+  const dat2 = t.map(x=>x.nbDechets);
+
+  if (sparkChart) sparkChart.destroy();
+sparkChart = new Chart(document.getElementById('sparkChart'), {
+  type: 'line',
+  data: { labels: lab2, datasets: [{ data: dat2, tension: 0.35 }] },
+  options: { plugins:{ legend:{display:false}}, elements:{ point:{ radius:0 } }, scales:{ y:{ beginAtZero:true, precision:0 } } }
+});
+}
+
+
+/* --- Data loader --- */
+async function load(){
+  const u = new URL(urlData.toString());
+  Object.entries(state).forEach(([k,v])=>u.searchParams.set(k,String(v)));
+  const res = await fetch(u, {headers:{'Accept':'application/json'}});
+  if (!res.ok) { console.error('Fetch error', res.status, res.statusText); return; }
+  const json = await res.json();
+  renderRows(json.items);
+  renderPager(json.meta.total);
+  upCharts(json.stats);
+}
+
+/* --- Events --- */
+let t=null;
+q.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=>{state.q=q.value; state.page=1; load();}, 300); });
+sort.addEventListener('change', ()=>{ state.sort=sort.value; state.page=1; load(); });
+dirBtn.addEventListener('click', ()=>{
+  state.dir = state.dir==='ASC' ? 'DESC' : 'ASC';
+  dirBtn.querySelector('span').textContent = state.dir;
+  dirBtn.querySelector('i').className = state.dir==='ASC' ? 'ti ti-sort-ascending-letters me-1' : 'ti ti-sort-descending-letters me-1';
+  state.page=1; load();
+});
+limit.addEventListener('change', ()=>{ state.limit=parseInt(limit.value,10)||10; state.page=1; load(); });
+
+// Download CSV (re-fetch ALL filtered rows)
+btnCsv.addEventListener('click', async () => {
+  const u = new URL(urlData.toString());
+  u.searchParams.set('q', state.q);
+  u.searchParams.set('sort', state.sort);
+  u.searchParams.set('dir', state.dir);
+  u.searchParams.set('page', '1');
+  u.searchParams.set('limit', '100000'); // grand cap
+  const res = await fetch(u, { headers: { 'Accept': 'application/json' } });
+  const json = await res.json();
+  downloadCsvWithStats(json.items, json.stats);
+});
+
+/* --- Init --- */
+limit.value = state.limit;
+load();
+</script>
 {% endblock %}
