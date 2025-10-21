@@ -10,7 +10,10 @@
                 <div class="card-header bg-primary text-white">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2>📊 Traçabilité du Déchet</h2>
-                        <span class="badge bg-light text-dark">ID: {{ dechet.id }}</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-light text-dark">ID: {{ dechet.id }}</span>
+                            <a href="{{ path('app_dechet_tracabilite_export_pdf', {'id': dechet.id}) }}" class="btn btn-outline-light">⬇️ Exporter PDF</a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">

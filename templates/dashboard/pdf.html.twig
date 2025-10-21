@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport Tableau de Bord - Déchets</title>
+    <style>
+        body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; }
+        h1 { margin: 0 0 10px; font-size: 20px; }
+        h2 { margin: 16px 0 8px; font-size: 16px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #333; padding: 6px 8px; }
+        th { background: #efefef; }
+        .small { color: #666; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <h1>Rapport - Gestion des Déchets</h1>
+    <p class="small">Généré le {{ "now"|date('d/m/Y H:i') }}</p>
+
+    <h2>Dernières Entrées</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Quantité</th>
+                <th>État</th>
+                <th>Date de production</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in dechets %}
+            <tr>
+                <td>{{ d.id }}</td>
+                <td>{{ d.type }}</td>
+                <td>{{ d.quantite }}</td>
+                <td>{{ d.etat }}</td>
+                <td>{{ d.dateProduction ? d.dateProduction|date('d/m/Y H:i') : '' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">Aucune donnée à afficher.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -8,12 +8,15 @@
 
     {% if dechets|length > 0 %}
     <div class="card">
-        <div class="card-header">
-            <h5>{{ dechets|length }} déchet(s) en attente d'assignation</h5>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">{{ dechets|length }} déchet(s) en attente d'assignation</h5>
+            <div class="ms-3" style="max-width: 280px;">
+                <input type="text" class="form-control form-control-sm js-table-search" data-target="#processus-list-table" placeholder="Rechercher...">
+            </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table id="processus-list-table" class="table table-striped" data-sortable="true">
                     <thead>
                         <tr>
                             <th>ID</th>

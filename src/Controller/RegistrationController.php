@@ -7,16 +7,20 @@ use App\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Security;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use App\Security\AppCustomAuthenticator;
 
 class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, Security $security): Response
+
     {
 
 
@@ -38,12 +42,14 @@ class RegistrationController extends AbstractController
             );
             $user->setRegistrationDate(new \DateTime('+1 hour'));
             $user->setRoles(['ROLE_COACH']);
-             $entityManager->persist($user);
+            $entityManager->persist($user);
             $entityManager->flush();
 
             // do anything else you need here, like send an email
             // automatically log in the user
+ 
             $security->login($user);
+ 
 
             return $this->redirectToRoute('app_dechet_workflow');
         }

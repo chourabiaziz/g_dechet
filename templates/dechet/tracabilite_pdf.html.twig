@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Traçabilité Déchet #{{ dechet.id }}</title>
+    <style>
+        body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; color: #222; }
+        h1 { font-size: 20px; margin: 0 0 10px 0; }
+        h2 { font-size: 16px; margin: 20px 0 8px 0; }
+        .meta { margin-bottom: 10px; }
+        .badge { display: inline-block; padding: 4px 8px; border: 1px solid #999; border-radius: 4px; }
+        table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+        th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+        th { background: #f3f3f3; }
+        .section { page-break-inside: avoid; margin-bottom: 12px; }
+        .timeline { border-left: 3px solid #555; padding-left: 10px; }
+        .timeline-item { margin: 6px 0; }
+        .small { color: #666; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <h1>Traçabilité du Déchet</h1>
+    <div class="meta">
+        <span class="badge">ID: {{ dechet.id }}</span>
+        {% if dechet.dateProduction %}
+            <span class="small">• Date de production: {{ dechet.dateProduction|date('d/m/Y H:i') }}</span>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>Informations du Déchet</h2>
+        <table>
+            <tr><th>Type</th><td>{{ dechet.type }}</td></tr>
+            <tr><th>Quantité</th><td>{{ dechet.quantite }} kg</td></tr>
+            <tr><th>État</th><td>{{ dechet.etat }}</td></tr>
+            {% if dechet.source %}<tr><th>Source</th><td>{{ dechet.source.nom }}</td></tr>{% endif %}
+            {% if dechet.acteur %}<tr><th>Acteur</th><td>{{ dechet.acteur.nom }}</td></tr>{% endif %}
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Processus Associés</h2>
+        {% if dechet.processuses|length > 0 %}
+            <table>
+                <thead>
+                    <tr><th>Nom</th><th>Type</th><th>Autorité</th></tr>
+                </thead>
+                <tbody>
+                {% for processus in dechet.processuses %}
+                    <tr>
+                        <td>{{ processus.nom }}</td>
+                        <td>{{ processus.type }}</td>
+                        <td>{% if processus.autorite %}{{ processus.autorite.nom }}{% else %}-{% endif %}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="small">Aucun processus assigné.</div>
+        {% endif %}
+    </div>
+
+    {% if dechet.produitrecycle %}
+    <div class="section">
+        <h2>Produit Recyclé</h2>
+        <table>
+            <tr><th>Nom</th><td>{{ dechet.produitrecycle.nom }}</td></tr>
+            <tr><th>Type</th><td>{{ dechet.produitrecycle.type }}</td></tr>
+            {% if dechet.produitrecycle.boucle %}
+            <tr><th>Boucle d'économie</th><td>{{ dechet.produitrecycle.boucle.nom }}</td></tr>
+            <tr><th>Objectif</th><td>{{ dechet.produitrecycle.boucle.objectif }}</td></tr>
+            {% endif %}
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="section">
+        <h2>Historique de Traçabilité</h2>
+        {% if dechet.tracabilite %}
+            <div class="timeline">
+                {% set historiqueLines = dechet.tracabilite.historique|split('\n') %}
+                {% for line in historiqueLines %}
+                    {% if line|trim %}
+                        <div class="timeline-item">• {{ line|trim }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% if dechet.tracabilite.dateMiseAJour %}
+            <div class="small">Dernière mise à jour: {{ dechet.tracabilite.dateMiseAJour|date('d/m/Y H:i') }}</div>
+            {% endif %}
+        {% else %}
+            <div class="small">Aucun historique disponible.</div>
+        {% endif %}
+    </div>
+</body>
+</html>
